@@ -1,22 +1,35 @@
 import React, { useEffect, useState } from "react";
 import RegistroPaquete from "../components/RegistroPaquete";
 import Estanterias from "../components/Estanterias";
+import { obtenerPaquetes } from "../services/paquetesService";
 
 export default function Home() {
-  const [paquetes, setPaquetes] = useState(() => {
-    const guardados = localStorage.getItem("paquetes");
-    return guardados ? JSON.parse(guardados) : [];
-  });
+  const [paquetes, setPaquetes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const cargarPaquetes = async () => {
+    setLoading(true);
+    try {
+      const data = await obtenerPaquetes();
+      setPaquetes(data);
+    } catch (err) {
+      console.error("Error al cargar paquetes:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    localStorage.setItem("paquetes", JSON.stringify(paquetes));
-  }, [paquetes]);
+    cargarPaquetes();
+  }, []);
 
   return (
     <div style={{ padding: "2rem" }}>
       <h1>📦 Gestión de Paquetes</h1>
-      <Estanterias paquetes={paquetes} />
-      <RegistroPaquete paquetes={paquetes} setPaquetes={setPaquetes} />
+      {loading ? <p>Cargando paquetes...</p> : <>
+        <Estanterias paquetes={paquetes} />
+        <RegistroPaquete paquetes={paquetes} actualizarPaquetes={cargarPaquetes} />
+      </>}
     </div>
   );
 }
