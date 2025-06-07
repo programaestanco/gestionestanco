@@ -77,15 +77,36 @@
   background-color: #ffebee;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .estanteria-columnas {
-    flex-direction: column;
-    align-items: center;
+    flex-wrap: nowrap; /* No se envuelven en varias líneas */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    scroll-snap-type: x mandatory;
   }
 
   .columna {
-    width: 100%;
-    max-width: 400px;
+    flex: 0 0 auto;
+    min-width: 220px;
+    max-width: 220px;
+    scroll-snap-align: start;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-right: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .columna:last-child {
+    margin-right: 0; /* Eliminar margen derecho de la última columna */
+  }
+
+  .columna h4 {
+    margin-bottom: 0.5rem;
+    text-align: center;
   }
 }
