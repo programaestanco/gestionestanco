@@ -65,6 +65,48 @@
   background-color: #e74c3c;
 }
 
+.estanterias-toggle-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.toggle-estanterias {
+  background: linear-gradient(to right, #6a11cb, #2575fc);
+  color: white;
+  padding: 0.8rem 1.6rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-estanterias:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-estanterias.activo {
+  background: linear-gradient(to right, #ff416c, #ff4b2b);
+}
+
+.estanterias-wrapper {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.4s ease;
+}
+
+.estanterias-wrapper.visible {
+  max-height: 1000px; /* suficiente para mostrar el contenido */
+  opacity: 1;
+}
 
 /* Responsive */
 @media (max-width: 768px) {

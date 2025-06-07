@@ -9,13 +9,15 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
   const [busqueda, setBusqueda] = useState("");
   const [filtroCompania, setFiltroCompania] = useState("");
   const [filtroBalda, setFiltroBalda] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState("pendiente");
 
   const filtrados = paquetes.filter((p) => {
-    return (
-      (!busqueda || p.cliente.toLowerCase().includes(busqueda.toLowerCase())) &&
-      (!filtroCompania || p.compania === filtroCompania) &&
-      (!filtroBalda || p.compartimento === filtroBalda)
-    );
+    const coincideBusqueda = !busqueda || p.cliente.toLowerCase().includes(busqueda.toLowerCase());
+    const coincideCompania = !filtroCompania || p.compania === filtroCompania;
+    const coincideBalda = !filtroBalda || p.compartimento === filtroBalda;
+    const coincideEstado = filtroEstado === "todos" || p.estado === filtroEstado;
+
+    return coincideBusqueda && coincideCompania && coincideBalda && coincideEstado;
   });
 
   const handleEliminar = async (id) => {
@@ -42,17 +44,25 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
         />
+
         <select value={filtroCompania} onChange={(e) => setFiltroCompania(e.target.value)}>
           <option value="">Todas las compañías</option>
           {[...new Set(paquetes.map(p => p.compania))].map((c) => (
             <option key={c}>{c}</option>
           ))}
         </select>
+
         <select value={filtroBalda} onChange={(e) => setFiltroBalda(e.target.value)}>
           <option value="">Todas las baldas</option>
           {[...new Set(paquetes.map(p => p.compartimento))].map((b) => (
             <option key={b}>{b}</option>
           ))}
+        </select>
+
+        <select value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value)}>
+          <option value="pendiente">Pendientes</option>
+          <option value="entregado">Entregados</option>
+          <option value="todos">Todos</option>
         </select>
       </div>
 

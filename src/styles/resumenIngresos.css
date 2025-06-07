@@ -1,32 +1,76 @@
 .resumen-ingresos {
-  margin: 2rem auto;
-  padding: 1rem 2rem;
-  background: #fffbe6;
-  border: 2px solid #ffd700;
-  border-radius: 12px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #4a3600;
+  background: #faf4e8;
+  padding: 2rem;
+  border-radius: 1.2rem;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+  margin-top: 2rem;
+  font-family: 'Segoe UI', sans-serif;
+  color: #3c2b1c;
+}
+
+.resumen-ingresos h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.6rem;
+  color: #5b3c15;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  width: fit-content;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  animation: aparecerSuave 0.4s ease;
+  gap: 0.5rem;
 }
 
-.resumen-ingresos i {
-  color: #ffd700;
-  font-size: 1.4rem;
+.ingresos-empresas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.2rem;
 }
 
-@keyframes aparecerSuave {
-  0% {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.empresa-card {
+  background: #fffbe6;
+  border: 2px solid #e0c080;
+  border-radius: 0.8rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  transition: transform 0.2s;
+}
+
+.empresa-card:hover {
+  transform: scale(1.03);
+}
+
+.empresa-nombre {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.empresa-valor {
+  font-size: 1.3rem;
+  color: #4a340d;
+}
+
+.empresa-diferencia {
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.empresa-diferencia.positivo {
+  color: green;
+}
+
+.empresa-diferencia.negativo {
+  color: red;
+}
+
+.empresa-diferencia.neutral {
+  color: #999;
+}
+
+.total-ingresos {
+  margin-top: 2rem;
+  text-align: right;
+  font-size: 1.3rem;
+  color: #2c1b0f;
+  font-weight: bold;
 }

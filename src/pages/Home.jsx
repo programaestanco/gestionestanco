@@ -13,6 +13,7 @@ export default function Home() {
   const navigate = useNavigate();
   const [paquetes, setPaquetes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mostrarEstanterias, setMostrarEstanterias] = useState(false);
 
   const cargarPaquetes = async () => {
     setLoading(true);
@@ -61,11 +62,38 @@ export default function Home() {
               paquetes={paquetes}
               actualizarPaquetes={cargarPaquetes}
             />
-            <Estanterias paquetes={paquetes} />
+
+            <div className="estanterias-toggle-container">
+              <button
+                className={`toggle-estanterias ${
+                  mostrarEstanterias ? "activo" : ""
+                }`}
+                onClick={() => setMostrarEstanterias(!mostrarEstanterias)}
+              >
+                <i
+                  className={`fas ${
+                    mostrarEstanterias ? "fa-eye-slash" : "fa-eye"
+                  }`}
+                ></i>{" "}
+                {mostrarEstanterias
+                  ? "Ocultar estanterías"
+                  : "Mostrar estanterías"}
+              </button>
+            </div>
+
+            <div
+              className={`estanterias-wrapper ${
+                mostrarEstanterias ? "visible" : "oculto"
+              }`}
+            >
+              <Estanterias paquetes={paquetes} />
+            </div>
+
             <ListaPaquetes
               paquetes={paquetes}
               actualizarPaquetes={cargarPaquetes}
             />
+
             <ResumenIngresos paquetes={paquetes} />
           </>
         )}
