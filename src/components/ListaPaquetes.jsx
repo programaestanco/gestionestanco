@@ -73,16 +73,19 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
           <tbody>
             {filtrados.map((p) => (
               <tr key={p.id}>
-                <td>{p.cliente}</td>
-                <td>{p.compania}</td>
-                <td>{p.compartimento}</td>
-                <td>{new Date(p.fecha_recibido).toLocaleDateString()}</td>
-                <td className={p.estado === "entregado" ? "estado-entregado" : "estado-pendiente"}>
+                <td data-label="Cliente">{p.cliente}</td>
+                <td data-label="Compañía">{p.compania}</td>
+                <td data-label="Balda">{p.compartimento}</td>
+                <td data-label="Fecha">{new Date(p.fecha_recibido).toLocaleDateString()}</td>
+                <td
+                  data-label="Estado"
+                  className={p.estado === "entregado" ? "estado-entregado" : "estado-pendiente"}
+                >
                   {p.estado === "entregado"
                     ? `Entregado (${p.precio} €)`
                     : "Pendiente"}
                 </td>
-                <td>
+                <td data-label="Acciones">
                   {p.estado !== "entregado" && (
                     <button className="btn btn-entregar" onClick={() => handleEntregar(p.id)}>
                       <i className="fas fa-check"></i>

@@ -1,48 +1,106 @@
 .registro-paquete {
-  margin-top: 2rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 600px;
+  transition: all 0.3s ease;
 }
 
 .registro-paquete h2 {
   font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: #333;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  color: #2c2c2c;
+  gap: 10px;
 }
 
 .form-paquete {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #444;
+  font-size: 0.95rem;
 }
 
 .form-paquete input,
 .form-paquete select {
-  padding: 0.5rem 0.8rem;
-  font-size: 0.95rem;
+  padding: 0.7rem 1rem;
   border: 1px solid #ccc;
-  border-radius: 4px;
-  flex: 1;
-  min-width: 180px;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
 }
 
-.form-paquete button {
-  background-color: #2d89ef;
+.form-paquete input:focus,
+.form-paquete select:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+.btn-guardar {
+  background-color: #007bff;
   color: white;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
   border: none;
-  padding: 0.5rem 1.2rem;
-  border-radius: 4px;
-  font-weight: 500;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  align-self: flex-start;
+  transition: background-color 0.3s;
 }
 
-.form-paquete button:hover {
-  background-color: #1b66c9;
+.btn-guardar:hover {
+  background-color: #0056b3;
 }
 
-.form-paquete button:disabled {
-  background-color: #b2cde9;
-  cursor: not-allowed;
+.sugerencia-balda {
+  margin-top: 1.5rem;
+  background: #eaf4ff;
+  padding: 1rem;
+  border-left: 5px solid #007bff;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: #004085;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .registro-paquete {
+    padding: 1.5rem 1rem;
+    margin: 1.5rem;
+  }
+
+  .btn-guardar {
+    width: 100%;
+    text-align: center;
+  }
 }

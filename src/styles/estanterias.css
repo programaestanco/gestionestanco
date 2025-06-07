@@ -1,48 +1,91 @@
 .estanterias {
-  margin-top: 2rem;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 1200px;
+  transition: all 0.3s ease;
 }
 
 .estanterias-titulo {
   font-size: 1.8rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  color: #333;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: #333;
+  gap: 10px;
 }
 
-.estanteria-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1rem;
+.estanteria-columnas {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.columna {
+  flex: 1;
+  min-width: 180px;
+  max-width: 200px;
+}
+
+.columna h4 {
+  text-align: center;
+  font-size: 1.1rem;
+  margin-bottom: 0.7rem;
+  color: #444;
 }
 
 .estanteria {
-  border: 1px solid #999;
-  padding: 0.5rem;
-  height: 60px;
-  border-radius: 6px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.7rem;
+  background-color: #f0f0f0;
+  border-left: 6px solid;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.estanteria-label {
+  font-weight: bold;
+  font-size: 1.05rem;
+  margin-bottom: 0.3rem;
+}
+
+.estanteria-info {
   font-size: 0.95rem;
-  transition: transform 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.estanteria:hover {
-  transform: scale(1.05);
+/* Colores dinámicos */
+.verde {
+  border-left-color: #4caf50;
+  background-color: #e8f5e9;
 }
 
-.estanteria.verde {
-  background-color: #a3f7b5;
+.amarillo {
+  border-left-color: #ffca28;
+  background-color: #fff8e1;
 }
 
-.estanteria.amarillo {
-  background-color: #fff3b0;
+.rojo {
+  border-left-color: #f44336;
+  background-color: #ffebee;
 }
 
-.estanteria.rojo {
-  background-color: #ff7b7b;
+/* Responsive */
+@media (max-width: 768px) {
+  .estanteria-columnas {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .columna {
+    width: 100%;
+    max-width: 400px;
+  }
 }

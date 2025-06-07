@@ -3,6 +3,7 @@ import RegistroPaquete from "../components/RegistroPaquete";
 import Estanterias from "../components/Estanterias";
 import ListaPaquetes from "../components/ListaPaquetes";
 import { obtenerPaquetes } from "../services/paquetesService";
+import ResumenIngresos from "../components/ResumenIngresos";
 import "../styles/home.css";
 
 export default function Home() {
@@ -28,19 +29,25 @@ export default function Home() {
   return (
     <div className="home-container">
       <header className="home-header">
-        <h1>Gestión de Paquetes</h1>
-        <p>Visualiza, organiza y controla todos los paquetes desde un único lugar.</p>
+        <div className="header-content">
+          <h1 className="header-title">Gestión de Paquetes</h1>
+          <p className="header-subtitle">Organiza y controla todos los paquetes desde un único lugar.</p>
+        </div>
       </header>
 
-      {loading ? (
-        <div className="loading-indicator">Cargando paquetes...</div>
-      ) : (
-        <>
-          <Estanterias paquetes={paquetes} />
+      <main className="home-main">
+        {loading ? (
+          <div className="loading-indicator">Cargando paquetes...</div>
+        ) : (
+          <>
           <RegistroPaquete paquetes={paquetes} actualizarPaquetes={cargarPaquetes} />
-          <ListaPaquetes paquetes={paquetes} actualizarPaquetes={cargarPaquetes} />
-        </>
-      )}
+            <Estanterias paquetes={paquetes} />           
+            <ListaPaquetes paquetes={paquetes} actualizarPaquetes={cargarPaquetes} />
+            <ResumenIngresos paquetes={paquetes} />
+            
+          </>
+        )}
+      </main>
     </div>
   );
 }

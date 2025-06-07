@@ -15,24 +15,33 @@ export default function Estanterias({ paquetes }) {
     return "rojo";
   };
 
+  const columnas = Array.from({ length: 5 }, (_, colIdx) =>
+    BALDAS.slice(colIdx * 5, colIdx * 5 + 5)
+  );
+
   return (
-    <div className="estanterias">
+    <section className="estanterias">
       <h2 className="estanterias-titulo">
         <i className="fas fa-warehouse"></i> Estanterías
       </h2>
-      <div className="estanteria-grid">
-        {BALDAS.map((b) => {
-          const cantidad = conteo[b] || 0;
-          return (
-            <div key={b} className={`estanteria ${getColorClass(cantidad)}`}>
-              <strong>{b}</strong>
-              <small>
-                <i className="fas fa-box"></i> {cantidad} paquete{cantidad !== 1 ? "s" : ""}
-              </small>
-            </div>
-          );
-        })}
+      <div className="estanteria-columnas">
+        {columnas.map((col, colIdx) => (
+          <div key={colIdx} className="columna">
+            <h4>Columna {colIdx + 1}</h4>
+            {col.map((b) => {
+              const cantidad = conteo[b] || 0;
+              return (
+                <div key={b} className={`estanteria ${getColorClass(cantidad)}`}>
+                  <div className="estanteria-label">{b}</div>
+                  <div className="estanteria-info">
+                    <i className="fas fa-box"></i> {cantidad} paquete{cantidad !== 1 ? "s" : ""}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ))}
       </div>
-    </div>
+    </section>
   );
 }
