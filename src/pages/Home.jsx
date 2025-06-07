@@ -11,19 +11,22 @@ import "../styles/home.css";
 export default function Home() {
   const { logout } = useUser();
   const navigate = useNavigate();
+
   const [paquetes, setPaquetes] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingInicial, setLoadingInicial] = useState(true);
+  const [actualizando, setActualizando] = useState(false);
   const [mostrarEstanterias, setMostrarEstanterias] = useState(false);
 
   const cargarPaquetes = async () => {
-    setLoading(true);
+    setActualizando(true);
     try {
       const data = await obtenerPaquetes();
       setPaquetes(data);
     } catch (err) {
       console.error("Error al cargar paquetes:", err);
     } finally {
-      setLoading(false);
+      setActualizando(false);
+      setLoadingInicial(false);
     }
   };
 
@@ -38,62 +41,53 @@ export default function Home() {
 
   return (
     <div className="home-container">
-      <div className="logout-container">
-        <button className="logout-button" onClick={handleLogout}>
-          <i className="fas fa-sign-out-alt"></i> Cerrar sesión
-        </button>
-      </div>
-
+      {/* Header fijo con logout */}
       <header className="home-header">
-        <div className="header-content">
-          <h1 className="header-title">Gestión de Paquetes</h1>
-          <p className="header-subtitle">
-            Organiza y controla todos los paquetes desde un único lugar.
-          </p>
+        <div className="navbar">
+          <div className="logo-area">
+            <i className="fas fa-box-open"></i>
+            <span>Tracking Estanco</span>
+          </div>
+          <button className="logout-button" onClick={handleLogout}>
+            <i className="fas fa-sign-out-alt"></i>
+          </button>
+        </div>
+        <div className="hero">
+          <h1>Gestión de Paquetes</h1>
+          <p>Control profesional y centralizado de tu recepción de paquetes</p>
         </div>
       </header>
 
+      {/* Contenido principal */}
       <main className="home-main">
-        {loading ? (
+        <RegistroPaquete
+          paquetes={paquetes}
+          actualizarPaquetes={cargarPaquetes}
+        />
+
+        <div className="estanterias-toggle-container">
+          <button
+            className={`toggle-estanterias ${mostrarEstanterias ? "activo" : ""}`}
+            onClick={() => setMostrarEstanterias(!mostrarEstanterias)}
+          >
+            <i className={`fas ${mostrarEstanterias ? "fa-eye-slash" : "fa-eye"}`}></i>{" "}
+            {mostrarEstanterias ? "Ocultar estanterías" : "Mostrar estanterías"}
+          </button>
+        </div>
+
+        <div className={`estanterias-wrapper ${mostrarEstanterias ? "visible" : "oculto"}`}>
+          <Estanterias paquetes={paquetes} />
+        </div>
+
+        {loadingInicial ? (
           <div className="loading-indicator">Cargando paquetes...</div>
         ) : (
           <>
-            <RegistroPaquete
-              paquetes={paquetes}
-              actualizarPaquetes={cargarPaquetes}
-            />
-
-            <div className="estanterias-toggle-container">
-              <button
-                className={`toggle-estanterias ${
-                  mostrarEstanterias ? "activo" : ""
-                }`}
-                onClick={() => setMostrarEstanterias(!mostrarEstanterias)}
-              >
-                <i
-                  className={`fas ${
-                    mostrarEstanterias ? "fa-eye-slash" : "fa-eye"
-                  }`}
-                ></i>{" "}
-                {mostrarEstanterias
-                  ? "Ocultar estanterías"
-                  : "Mostrar estanterías"}
-              </button>
-            </div>
-
-            <div
-              className={`estanterias-wrapper ${
-                mostrarEstanterias ? "visible" : "oculto"
-              }`}
-            >
-              <Estanterias paquetes={paquetes} />
-            </div>
-
             <ListaPaquetes
               paquetes={paquetes}
               actualizarPaquetes={cargarPaquetes}
+              cargando={actualizando}
             />
-
             <ResumenIngresos paquetes={paquetes} />
           </>
         )}

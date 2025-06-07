@@ -131,6 +131,90 @@
   text-align: center;
 }
 
+.modal-exito {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #2be844;
+  color: white;
+  padding: 1rem 1.4rem;
+  border-radius: 8px;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  animation: aparecerToast 0.4s ease, desaparecerToast 0.4s ease 2.4s;
+}
+
+@keyframes aparecerToast {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes desaparecerToast {
+  to {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+}
+.modal-confirmacion {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal-confirmacion .modal-contenido {
+  background: #fffdf7;
+  color: #3c2f1d;
+  border-radius: 10px;
+  padding: 2rem 2.5rem;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  max-width: 400px;
+  animation: aparecerToast 0.3s ease;
+}
+
+.modal-confirmacion h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.6rem;
+}
+
+.modal-confirmacion .acciones {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.modal-confirmacion .btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+}
+
+.modal-confirmacion .btn.cancelar {
+  background: #bbb;
+  color: #222;
+}
+
+.modal-confirmacion .btn.confirmar {
+  background: #e53935;
+  color: white;
+}
 
 /* Responsive: Vista móvil mejorada */
 @media (max-width: 768px) {

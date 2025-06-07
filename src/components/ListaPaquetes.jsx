@@ -14,6 +14,8 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
   const [filtroBalda, setFiltroBalda] = useState("");
   const [filtroEstado, setFiltroEstado] = useState("pendiente");
   const [paginaActual, setPaginaActual] = useState(1);
+  const [toastMensaje, setToastMensaje] = useState(""); // nuevo unificado
+  const [paqueteAEliminar, setPaqueteAEliminar] = useState(null);
 
   const filtrados = paquetes
     .filter((p) => {
@@ -38,20 +40,37 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
     }
   };
 
-  const handleEliminar = async (id) => {
-    if (!window.confirm("¿Eliminar este paquete?")) return;
-    await eliminarPaquete(id);
-    await actualizarPaquetes();
+  const mostrarToast = (mensaje) => {
+    setToastMensaje(mensaje);
+    setTimeout(() => setToastMensaje(""), 3000);
+  };
+
+  const confirmarEliminar = async () => {
+    if (!paqueteAEliminar) return;
+    await eliminarPaquete(paqueteAEliminar.id);
+    setPaqueteAEliminar(null);
+    actualizarPaquetes();
+    mostrarToast("¡Paquete eliminado correctamente!");
+  };
+
+  const cancelarEliminar = () => {
+    setPaqueteAEliminar(null);
+  };
+
+  const handleEliminar = (paquete) => {
+    setPaqueteAEliminar(paquete);
   };
 
   const handleEntregar = async (id) => {
     await entregarPaquete(id);
-    await actualizarPaquetes();
+    actualizarPaquetes();
+    mostrarToast("¡Paquete marcado como entregado!");
   };
 
   const handleRevertir = async (id) => {
     await marcarComoPendiente(id);
-    await actualizarPaquetes();
+    actualizarPaquetes();
+    mostrarToast("¡Estado revertido a pendiente!");
   };
 
   return (
@@ -70,7 +89,6 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
             setPaginaActual(1);
           }}
         />
-
         <select
           value={filtroCompania}
           onChange={(e) => {
@@ -83,7 +101,6 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
             <option key={c}>{c}</option>
           ))}
         </select>
-
         <select
           value={filtroBalda}
           onChange={(e) => {
@@ -96,7 +113,6 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
             <option key={b}>{b}</option>
           ))}
         </select>
-
         <select
           value={filtroEstado}
           onChange={(e) => {
@@ -117,24 +133,12 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
           <table className="tabla-paquetes">
             <thead>
               <tr>
-                <th>
-                  <i className="fas fa-user"></i> Cliente
-                </th>
-                <th>
-                  <i className="fas fa-truck"></i> Compañía
-                </th>
-                <th>
-                  <i className="fas fa-layer-group"></i> Balda
-                </th>
-                <th>
-                  <i className="fas fa-calendar-day"></i> Fecha
-                </th>
-                <th>
-                  <i className="fas fa-tag"></i> Estado
-                </th>
-                <th>
-                  <i className="fas fa-cogs"></i>
-                </th>
+                <th><i className="fas fa-user"></i> Cliente</th>
+                <th><i className="fas fa-truck"></i> Compañía</th>
+                <th><i className="fas fa-layer-group"></i> Balda</th>
+                <th><i className="fas fa-calendar-day"></i> Fecha</th>
+                <th><i className="fas fa-tag"></i> Estado</th>
+                <th><i className="fas fa-cogs"></i></th>
               </tr>
             </thead>
             <tbody>
@@ -183,7 +187,7 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
                     )}
                     <button
                       className="btn btn-eliminar"
-                      onClick={() => handleEliminar(p.id)}
+                      onClick={() => handleEliminar(p)}
                     >
                       <i className="fas fa-trash-alt"></i>
                     </button>
@@ -211,6 +215,33 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
             </button>
           </div>
         </>
+      )}
+
+      {toastMensaje && (
+        <div className="modal-exito">
+          <div className="modal-contenido">
+            <i className="fas fa-check-circle"></i> {toastMensaje}
+          </div>
+        </div>
+      )}
+
+      {paqueteAEliminar && (
+        <div className="modal-confirmacion">
+          <div className="modal-contenido">
+            <h3>¿Estás seguro?</h3>
+            <p>
+              El paquete de <strong>{paqueteAEliminar.cliente}</strong> será eliminado.
+            </p>
+            <div className="acciones">
+              <button className="btn cancelar" onClick={cancelarEliminar}>
+                Cancelar
+              </button>
+              <button className="btn confirmar" onClick={confirmarEliminar}>
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

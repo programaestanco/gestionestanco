@@ -180,6 +180,41 @@ button[type="submit"]:disabled {
     transform: translateY(0);
   }
 }
+.modal-exito1 {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4caf50;
+  color: white;
+  padding: 1rem 1.4rem;
+  border-radius: 8px;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  animation: aparecerToast 0.4s ease, desaparecerToast 0.4s ease 2.4s;
+}
+
+@keyframes aparecerToast {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes desaparecerToast {
+  to {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+}
+
 
 /* Responsive */
 @media (max-width: 600px) {

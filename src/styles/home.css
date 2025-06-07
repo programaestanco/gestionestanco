@@ -1,3 +1,4 @@
+/* Contenedor general */
 .home-container {
   font-family: "Segoe UI", sans-serif;
   padding: 2rem;
@@ -5,31 +6,88 @@
   margin: 0 auto;
 }
 
+/* CABECERA VISUAL Y PROFESIONAL */
 .home-header {
-  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  background: linear-gradient(145deg, #d7ecff, #eff8ff);
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+/* BARRA SUPERIOR CON LOGO Y LOGOUT */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f4f6f8;
+  padding: 1rem 1.5rem;
   border-radius: 1rem;
-  padding: 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.logo-area {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.logo-area i {
+  font-size: 1.2rem;
+  color: #0d47a1;
+}
+
+/* Botón logout */
+.logout-button {
+  background-color: #c0392b;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logout-button:hover {
+  background-color: #e74c3c;
+}
+
+/* TEXTO PRINCIPAL */
+.hero {
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
+  padding-top: 1rem;
 }
 
-.header-content {
-  max-width: 700px;
-  margin: 0 auto;
-}
-
-.header-title {
-  font-size: 2.8rem;
-  color: #1a237e;
+.hero h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #0d47a1;
   margin-bottom: 0.5rem;
 }
 
-.header-subtitle {
-  font-size: 1.2rem;
-  color: #37474f;
+.hero p {
+  font-size: 1.1rem;
+  color: #495057;
 }
 
+/* CUERPO PRINCIPAL */
+.home-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* INDICADOR DE CARGA */
 .loading-indicator {
   text-align: center;
   font-size: 1.2rem;
@@ -37,34 +95,7 @@
   color: #555;
 }
 
-.home-main {
-  display: flex;
-  flex-direction: column;
-  gap: 2.5rem;
-}
-.logout-container {
-  display: flex;
-  justify-content: flex-end;
-  padding: 1rem 2rem;
-  background-color: #f3f3f3;
-}
-
-.logout-button {
-  background-color: #c0392b;
-  color: white;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s ease;
-}
-
-.logout-button:hover {
-  background-color: #e74c3c;
-}
-
+/* BOTÓN DE DESPLEGAR ESTANTERÍAS */
 .estanterias-toggle-container {
   display: flex;
   justify-content: center;
@@ -74,28 +105,29 @@
 .toggle-estanterias {
   background: linear-gradient(to right, #6a11cb, #2575fc);
   color: white;
-  padding: 0.8rem 1.6rem;
+  padding: 0.9rem 1.8rem;
   font-size: 1.1rem;
   font-weight: bold;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .toggle-estanterias:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
 }
 
 .toggle-estanterias.activo {
   background: linear-gradient(to right, #ff416c, #ff4b2b);
 }
 
+/* ANIMACIÓN ESTANTERÍAS */
 .estanterias-wrapper {
   max-height: 0;
   overflow: hidden;
@@ -104,21 +136,38 @@
 }
 
 .estanterias-wrapper.visible {
-  max-height: 1000px; /* suficiente para mostrar el contenido */
+  max-height: 1200px;
   opacity: 1;
+  transition: max-height 0.5s ease, opacity 0.5s ease;
 }
 
-/* Responsive */
+/* RESPONSIVE */
 @media (max-width: 768px) {
   .home-container {
     padding: 1rem;
   }
 
-  .header-title {
-    font-size: 2rem;
+  .hero h1 {
+    font-size: 1.8rem;
   }
 
-  .header-subtitle {
+  .hero p {
     font-size: 1rem;
+  }
+
+  .logout-button {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .toggle-estanterias {
+    font-size: 1rem;
+    padding: 0.7rem 1.4rem;
+  }
+
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
   }
 }

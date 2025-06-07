@@ -14,6 +14,7 @@ export default function RegistroPaquete({ paquetes, actualizarPaquetes }) {
   const [baldaSugerida, setBaldaSugerida] = useState("");
   const [baldaSeleccionada, setBaldaSeleccionada] = useState("");
   const [loading, setLoading] = useState(false);
+  const [exito, setExito] = useState(false);
 
   const columnas = Array.from({ length: 5 }, (_, colIdx) =>
     BALDAS.slice(colIdx * 5, colIdx * 5 + 5)
@@ -24,7 +25,6 @@ export default function RegistroPaquete({ paquetes, actualizarPaquetes }) {
       acc[p.compartimento] = (acc[p.compartimento] || 0) + 1;
       return acc;
     }, {});
-
     const columnasOrdenadas = columnas
       .map((col) => {
         const total = col.reduce((sum, b) => sum + (conteo[b] || 0), 0);
@@ -58,7 +58,9 @@ export default function RegistroPaquete({ paquetes, actualizarPaquetes }) {
       });
       setCliente("");
       setCompania(COMPANIAS[0]);
-      await actualizarPaquetes();
+      setExito(true);
+      actualizarPaquetes(); // sin await
+      setTimeout(() => setExito(false), 3000);
     } catch (err) {
       alert("Error: " + err.message);
     } finally {
@@ -109,6 +111,15 @@ export default function RegistroPaquete({ paquetes, actualizarPaquetes }) {
           {loading ? "Guardando..." : "Guardar paquete"}
         </button>
       </form>
+
+      {exito && (
+        <div className="modal-exito1">
+          <div className="modal-contenido">
+            <i className="fas fa-check-circle"></i>
+            ¡Paquete almacenado con éxito!
+          </div>
+        </div>
+      )}
     </div>
   );
 }
