@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { registrarPaquete } from "../services/paquetesService";
+import "../styles/registroPaquete.css";
 
 const BALDAS = Array.from({ length: 25 }, (_, i) => `B${i + 1}`);
 const COMPANIAS = [
@@ -36,7 +37,7 @@ export default function RegistroPaquete({ paquetes, actualizarPaquetes }) {
       });
       setCliente("");
       setCompania(COMPANIAS[0]);
-      await actualizarPaquetes(); // Recargar lista desde backend
+      await actualizarPaquetes();
     } catch (err) {
       alert("Hubo un error: " + err.message);
     } finally {
@@ -45,26 +46,24 @@ export default function RegistroPaquete({ paquetes, actualizarPaquetes }) {
   };
 
   return (
-    <div style={{ marginTop: "2rem" }}>
-      <h2>➕ Añadir nuevo paquete</h2>
-      <form onSubmit={handleSubmit}>
+    <div className="registro-paquete">
+      <h2><i className="fas fa-plus-circle"></i> Añadir nuevo paquete</h2>
+      <form onSubmit={handleSubmit} className="form-paquete">
         <input
           type="text"
           placeholder="Nombre del cliente"
           value={cliente}
           onChange={(e) => setCliente(e.target.value)}
-          style={{ marginRight: "1rem", padding: "0.5rem" }}
         />
         <select
           value={compania}
           onChange={(e) => setCompania(e.target.value)}
-          style={{ marginRight: "1rem", padding: "0.5rem" }}
         >
           {COMPANIAS.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
-        <button type="submit" style={{ padding: "0.5rem 1rem" }} disabled={loading}>
+        <button type="submit" disabled={loading}>
           {loading ? "Guardando..." : "Guardar"}
         </button>
       </form>

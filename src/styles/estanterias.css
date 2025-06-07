@@ -1,0 +1,48 @@
+.estanterias {
+  margin-top: 2rem;
+}
+
+.estanterias-titulo {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #333;
+}
+
+.estanteria-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+}
+
+.estanteria {
+  border: 1px solid #999;
+  padding: 0.5rem;
+  height: 60px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.95rem;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.estanteria:hover {
+  transform: scale(1.05);
+}
+
+.estanteria.verde {
+  background-color: #a3f7b5;
+}
+
+.estanteria.amarillo {
+  background-color: #fff3b0;
+}
+
+.estanteria.rojo {
+  background-color: #ff7b7b;
+}

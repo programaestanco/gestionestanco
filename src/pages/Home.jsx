@@ -3,6 +3,7 @@ import RegistroPaquete from "../components/RegistroPaquete";
 import Estanterias from "../components/Estanterias";
 import ListaPaquetes from "../components/ListaPaquetes";
 import { obtenerPaquetes } from "../services/paquetesService";
+import "../styles/home.css";
 
 export default function Home() {
   const [paquetes, setPaquetes] = useState([]);
@@ -25,11 +26,14 @@ export default function Home() {
   }, []);
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h1>📦 Gestión de Paquetes</h1>
+    <div className="home-container">
+      <header className="home-header">
+        <h1>Gestión de Paquetes</h1>
+        <p>Visualiza, organiza y controla todos los paquetes desde un único lugar.</p>
+      </header>
 
       {loading ? (
-        <p>Cargando paquetes...</p>
+        <div className="loading-indicator">Cargando paquetes...</div>
       ) : (
         <>
           <Estanterias paquetes={paquetes} />

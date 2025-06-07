@@ -3,6 +3,7 @@ import {
   eliminarPaquete,
   entregarPaquete,
 } from "../services/paquetesService";
+import "../styles/listaPaquetes.css";
 
 export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
   const [busqueda, setBusqueda] = useState("");
@@ -29,10 +30,12 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
   };
 
   return (
-    <div style={{ marginTop: "2rem" }}>
-      <h2>📋 Lista de paquetes</h2>
+    <div className="lista-paquetes">
+      <h2>
+        <i className="fas fa-boxes-stacked"></i> Lista de Paquetes
+      </h2>
 
-      <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
+      <div className="filtros">
         <input
           type="text"
           placeholder="Buscar cliente..."
@@ -54,17 +57,17 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
       </div>
 
       {filtrados.length === 0 ? (
-        <p>No hay paquetes que coincidan.</p>
+        <p className="sin-paquetes">No hay paquetes que coincidan.</p>
       ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <table className="tabla-paquetes">
           <thead>
             <tr>
-              <th>👤 Cliente</th>
-              <th>🚚 Compañía</th>
-              <th>📍 Compartimento</th>
-              <th>📅 Fecha</th>
-              <th>💰 Estado</th>
-              <th>⚙️</th>
+              <th><i className="fas fa-user"></i> Cliente</th>
+              <th><i className="fas fa-truck"></i> Compañía</th>
+              <th><i className="fas fa-layer-group"></i> Balda</th>
+              <th><i className="fas fa-calendar-day"></i> Fecha</th>
+              <th><i className="fas fa-tag"></i> Estado</th>
+              <th><i className="fas fa-cogs"></i></th>
             </tr>
           </thead>
           <tbody>
@@ -74,16 +77,20 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
                 <td>{p.compania}</td>
                 <td>{p.compartimento}</td>
                 <td>{new Date(p.fecha_recibido).toLocaleDateString()}</td>
-                <td>
+                <td className={p.estado === "entregado" ? "estado-entregado" : "estado-pendiente"}>
                   {p.estado === "entregado"
-                    ? `✅ Entregado (${p.precio}€)`
-                    : "🕓 Pendiente"}
+                    ? `Entregado (${p.precio} €)`
+                    : "Pendiente"}
                 </td>
                 <td>
                   {p.estado !== "entregado" && (
-                    <button onClick={() => handleEntregar(p.id)}>✅ Entregar</button>
-                  )}{" "}
-                  <button onClick={() => handleEliminar(p.id)}>🗑️</button>
+                    <button className="btn btn-entregar" onClick={() => handleEntregar(p.id)}>
+                      <i className="fas fa-check"></i>
+                    </button>
+                  )}
+                  <button className="btn btn-eliminar" onClick={() => handleEliminar(p.id)}>
+                    <i className="fas fa-trash-alt"></i>
+                  </button>
                 </td>
               </tr>
             ))}

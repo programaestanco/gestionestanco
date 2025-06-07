@@ -1,0 +1,31 @@
+.home-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #2c2c2c;
+}
+
+.home-header {
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 1rem;
+}
+
+.home-header h1 {
+  font-size: 2.4rem;
+  margin: 0;
+  color: #1b1b1b;
+}
+
+.home-header p {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #555;
+}
+
+.loading-indicator {
+  font-size: 1.2rem;
+  color: #555;
+  margin-top: 2rem;
+}
