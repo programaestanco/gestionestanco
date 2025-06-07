@@ -27,6 +27,15 @@ export const entregarPaquete = async (id) => {
   return res.json();
 };
 
+// Revertir a estado pendiente
+export const marcarComoPendiente = async (id) => {
+  const res = await fetch(`${BASE_URL}/paquetes/pendiente/${id}`, {
+    method: "POST",
+  });
+  if (!res.ok) throw new Error("Error al marcar como pendiente");
+  return res.json();
+};
+
 // Eliminar paquete
 export const eliminarPaquete = async (id) => {
   const res = await fetch(`${BASE_URL}/paquetes/${id}`, {

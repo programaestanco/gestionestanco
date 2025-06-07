@@ -1,16 +1,11 @@
 .lista-paquetes {
-  background-color: #f8f9fa;
   padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  margin-top: 2rem;
-  overflow-x: auto;
+  font-family: "Segoe UI", sans-serif;
 }
 
 .lista-paquetes h2 {
   font-size: 1.8rem;
-  margin-bottom: 1.5rem;
-  color: #2e3a59;
+  margin-bottom: 1.2rem;
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -20,84 +15,122 @@
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .filtros input,
 .filtros select {
-  padding: 0.6rem 1rem;
-  font-size: 1rem;
-  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
   border: 1px solid #ccc;
-  flex: 1;
-  min-width: 160px;
+  border-radius: 6px;
+  font-size: 1rem;
 }
 
 .tabla-paquetes {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.95rem;
-}
-
-.tabla-paquetes thead {
-  background-color: #e3f2fd;
+  margin-top: 1rem;
 }
 
 .tabla-paquetes th,
 .tabla-paquetes td {
-  padding: 0.9rem 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ddd;
   text-align: left;
-  border-bottom: 1px solid #ddd;
 }
 
-.tabla-paquetes th i {
-  margin-right: 0.4rem;
-}
-
-.estado-pendiente {
-  color: #b87333;
-  font-weight: bold;
+.tabla-paquetes thead {
+  background-color: #f4f4f4;
 }
 
 .estado-entregado {
-  color: #2e7d32;
+  background-color: #e2fbe6;
+  color: #226622;
   font-weight: bold;
+}
+
+.estado-pendiente {
+  background-color: #fff7e6;
+  color: #b36b00;
+  font-weight: bold;
+}
+
+.fila-hover:hover {
+  background-color: #f0f0f0;
 }
 
 .btn {
   border: none;
-  cursor: pointer;
-  padding: 0.4rem 0.6rem;
-  border-radius: 0.4rem;
-  margin-right: 0.4rem;
-  transition: background 0.2s ease;
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin: 0 4px;
   font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
 .btn-entregar {
-  background-color: #43a047;
+  background-color: #28a745;
   color: white;
 }
 
 .btn-entregar:hover {
-  background-color: #388e3c;
+  background-color: #218838;
+}
+
+.btn-revertir {
+  background-color: #ffc107;
+  color: black;
+}
+
+.btn-revertir:hover {
+  background-color: #e0a800;
 }
 
 .btn-eliminar {
-  background-color: #e53935;
+  background-color: #dc3545;
   color: white;
 }
 
 .btn-eliminar:hover {
-  background-color: #c62828;
+  background-color: #c82333;
+}
+
+.paginacion {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.paginacion button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  transition: background 0.2s;
+}
+
+.paginacion button:disabled {
+  background-color: #999;
+  cursor: not-allowed;
+}
+
+.paginacion button:hover:not(:disabled) {
+  background-color: #0056b3;
 }
 
 .sin-paquetes {
-  font-style: italic;
-  color: #999;
+  margin-top: 2rem;
+  font-size: 1.2rem;
+  color: #666;
   text-align: center;
-  padding: 2rem;
 }
+
 
 /* Responsive: Vista móvil mejorada */
 @media (max-width: 768px) {
@@ -161,7 +194,51 @@
   margin-bottom: 0.3rem;
   font-size: 0.9rem;
 }
+.paginacion {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1rem;
+  flex-wrap: wrap;
+}
 
+.paginacion button {
+  background-color: #2e7d32;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.paginacion button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.paginacion span {
+  font-weight: bold;
+  color: #2e3a59;
+}
+/* Hover fila completa por estado */
+.tabla-paquetes tbody tr.estado-pendiente:hover {
+  background-color: #fff3e0; /* naranja claro */
+  transition: background-color 0.2s ease;
+}
+
+.tabla-paquetes tbody tr.estado-entregado:hover {
+  background-color: #e8f5e9; /* verde claro */
+  transition: background-color 0.2s ease;
+}
+
+/* También puedes suavizar el cursor y el efecto general */
+.tabla-paquetes tbody tr {
+  cursor: default;
+  transition: background-color 0.2s ease;
+}
 @media (max-width: 768px) {
   
   .tabla-paquetes td[data-label="Acciones"] {
