@@ -105,7 +105,7 @@ export default function ResumenIngresos({ paquetes }) {
                 const totalFila = EMPRESAS.reduce((acc, e) => acc + (fila[e] || 0), 0);
                 return (
                   <tr key={fila.dia}>
-                    <td>{fila.dia}</td>
+                    <td>{new Date(fila.dia).toLocaleDateString("es-ES")}</td>
                     {EMPRESAS.map((e) => (
                       <td key={e}>{(fila[e] || 0).toFixed(2)}</td>
                     ))}

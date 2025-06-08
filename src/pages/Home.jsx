@@ -53,7 +53,7 @@ export default function Home() {
           </button>
         </div>
         <div className="hero">
-          <h1>Gestión de Paquetes</h1>
+          <h1>GESTIÓN DE PAQUETES</h1>
           <p>Control profesional y centralizado de tu recepción de paquetes</p>
         </div>
       </header>
