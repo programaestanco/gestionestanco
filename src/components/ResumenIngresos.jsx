@@ -2,13 +2,17 @@ import React, { useEffect, useState } from "react";
 import "../styles/resumenIngresos.css";
 
 const PRECIO_POR_ENTREGA = 0.25;
-const EMPRESAS = ["Amazon", "Seur", "CorreosExpress", "DHL", "GLS", "UPS", "CTT", "Celeritas", "MRW", "Otros"];
+const EMPRESAS = [
+  "Amazon", "Seur", "CorreosExpress", "DHL", "GLS",
+  "UPS", "CTT", "Celeritas", "MRW", "Otros"
+];
 
 export default function ResumenIngresos({ paquetes }) {
   const [mostrar, setMostrar] = useState(false);
   const [resumen, setResumen] = useState({});
   const [detalleDiario, setDetalleDiario] = useState([]);
   const [total, setTotal] = useState(0);
+  const [ganadora, setGanadora] = useState(null);
 
   useEffect(() => {
     const ahora = new Date();
@@ -42,7 +46,6 @@ export default function ResumenIngresos({ paquetes }) {
 
     const totalGlobal = Object.values(ingresosPorEmpresa).reduce((acc, val) => acc + val, 0);
 
-    // Formatear detalles por día
     const filasDetalladas = Object.entries(ingresosPorDia).map(([dia, empresas]) => {
       const fila = { dia };
       EMPRESAS.forEach((e) => {
@@ -51,9 +54,13 @@ export default function ResumenIngresos({ paquetes }) {
       return fila;
     });
 
+    const empresaTop = Object.entries(ingresosPorEmpresa)
+      .sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+
     setResumen(ingresosPorEmpresa);
     setDetalleDiario(filasDetalladas);
     setTotal(totalGlobal);
+    setGanadora(empresaTop);
   }, [paquetes]);
 
   return (
@@ -74,12 +81,23 @@ export default function ResumenIngresos({ paquetes }) {
               </tr>
             </thead>
             <tbody>
-              {EMPRESAS.map((empresa) => (
-                <tr key={empresa}>
-                  <td>{empresa}</td>
-                  <td>{(resumen[empresa] || 0).toFixed(2)}</td>
-                </tr>
-              ))}
+              {EMPRESAS.map((empresa) => {
+                const ingreso = (resumen[empresa] || 0).toFixed(2);
+                const esTop = empresa === ganadora;
+                return (
+                  <tr key={empresa} className={esTop ? "top-empresa" : ""}>
+                    <td>{empresa}</td>
+                    <td>
+                      {ingreso}
+                      {esTop && (
+                        <span className="triangulo-verde" title="Empresa con más ingresos">
+                          ▲
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
             <tfoot>
               <tr>
