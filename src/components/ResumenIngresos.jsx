@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../styles/resumenIngresos.css";
 
 const PRECIO_POR_ENTREGA = 0.25;
-const EMPRESAS = ["Amazon", "Seur", "Correos_Express", "DHL", "Otros"];
+const EMPRESAS = ["Amazon", "Seur", "Correos Express", "DHL", "GLS", "UPS", "CTT", "Celeritas", "MRW", "Otros"];
 
 export default function ResumenIngresos({ paquetes }) {
   const [mostrar, setMostrar] = useState(false);
@@ -42,6 +42,7 @@ export default function ResumenIngresos({ paquetes }) {
 
     const totalGlobal = Object.values(ingresosPorEmpresa).reduce((acc, val) => acc + val, 0);
 
+    // Formatear detalles por día
     const filasDetalladas = Object.entries(ingresosPorDia).map(([dia, empresas]) => {
       const fila = { dia };
       EMPRESAS.forEach((e) => {
