@@ -5,7 +5,7 @@ import "../styles/registroPaquete.css";
 const BALDAS = Array.from({ length: 25 }, (_, i) => `B${i + 1}`);
 const COMPANIAS = [
   "Seur", "Amazon", "UPS", "GLS", "CTT",
-  "Celeritas", "MRW", "Correos Express", "Otros"
+  "Celeritas", "MRW", "CorreosExpress", "Otros"
 ];
 
 export default function RegistroPaquete({ paquetes, actualizarPaquetes }) {

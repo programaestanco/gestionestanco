@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../styles/resumenIngresos.css";
 
 const PRECIO_POR_ENTREGA = 0.25;
-const EMPRESAS = ["Amazon", "Seur", "Correos Express", "DHL", "GLS", "UPS", "CTT", "Celeritas", "MRW", "Otros"];
+const EMPRESAS = ["Amazon", "Seur", "CorreosExpress", "DHL", "GLS", "UPS", "CTT", "Celeritas", "MRW", "Otros"];
 
 export default function ResumenIngresos({ paquetes }) {
   const [mostrar, setMostrar] = useState(false);
