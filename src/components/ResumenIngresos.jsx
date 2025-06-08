@@ -2,84 +2,119 @@ import React, { useEffect, useState } from "react";
 import "../styles/resumenIngresos.css";
 
 const PRECIO_POR_ENTREGA = 0.25;
+const EMPRESAS = ["Amazon", "Seur", "Correos_Express", "DHL", "Otros"];
 
 export default function ResumenIngresos({ paquetes }) {
+  const [mostrar, setMostrar] = useState(false);
   const [resumen, setResumen] = useState({});
+  const [detalleDiario, setDetalleDiario] = useState([]);
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
     const ahora = new Date();
     const mesActual = ahora.getMonth();
     const añoActual = ahora.getFullYear();
-    const mesAnterior = mesActual === 0 ? 11 : mesActual - 1;
-    const añoAnterior = mesActual === 0 ? añoActual - 1 : añoActual;
 
-    const porEmpresa = {};
-    let totalGlobal = 0;
+    const ingresosPorEmpresa = {};
+    const ingresosPorDia = {};
+
+    EMPRESAS.forEach((empresa) => {
+      ingresosPorEmpresa[empresa] = 0;
+    });
 
     paquetes.forEach((p) => {
-      const fecha = new Date(p.fecha_entregado || p.updated_at || p.created_at);
       if (p.estado !== "entregado") return;
 
-      const empresa = p.empresa || "Desconocida";
-      const esActual =
-        fecha.getMonth() === mesActual && fecha.getFullYear() === añoActual;
-      const esAnterior =
-        fecha.getMonth() === mesAnterior && fecha.getFullYear() === añoAnterior;
+      const empresa = EMPRESAS.includes(p.compania) ? p.compania : "Otros";
+      const fecha = new Date(p.fecha_entregado || p.updated_at || p.created_at);
+      const año = fecha.getFullYear();
+      const mes = fecha.getMonth();
 
-      if (!porEmpresa[empresa]) {
-        porEmpresa[empresa] = {
-          actual: 0,
-          anterior: 0,
-        };
-      }
+      if (mes === mesActual && año === añoActual) {
+        const dia = fecha.toISOString().split("T")[0];
+        ingresosPorEmpresa[empresa] += PRECIO_POR_ENTREGA;
 
-      if (esActual) {
-        porEmpresa[empresa].actual += PRECIO_POR_ENTREGA;
-        totalGlobal += PRECIO_POR_ENTREGA;
-      } else if (esAnterior) {
-        porEmpresa[empresa].anterior += PRECIO_POR_ENTREGA;
+        if (!ingresosPorDia[dia]) ingresosPorDia[dia] = {};
+        if (!ingresosPorDia[dia][empresa]) ingresosPorDia[dia][empresa] = 0;
+        ingresosPorDia[dia][empresa] += PRECIO_POR_ENTREGA;
       }
     });
 
-    setResumen(porEmpresa);
+    const totalGlobal = Object.values(ingresosPorEmpresa).reduce((acc, val) => acc + val, 0);
+
+    const filasDetalladas = Object.entries(ingresosPorDia).map(([dia, empresas]) => {
+      const fila = { dia };
+      EMPRESAS.forEach((e) => {
+        fila[e] = empresas[e] || 0;
+      });
+      return fila;
+    });
+
+    setResumen(ingresosPorEmpresa);
+    setDetalleDiario(filasDetalladas);
     setTotal(totalGlobal);
   }, [paquetes]);
 
   return (
-    <div className="resumen-ingresos">
-      <h2><i className="fas fa-chart-line"></i> Ingresos por Empresa (Mes actual)</h2>
-      <div className="ingresos-empresas">
-        {Object.entries(resumen).map(([empresa, datos]) => {
-          const diferencia = datos.actual - datos.anterior;
-          const sube = diferencia > 0;
-          const igual = diferencia === 0;
+    <div className="resumen-ingresos-wrapper">
+      <button className="toggle-resumen" onClick={() => setMostrar(!mostrar)}>
+        <i className={`fas fa-chevron-${mostrar ? "up" : "down"}`}></i>
+        Ingresos
+      </button>
 
-          return (
-            <div className="empresa-card" key={empresa}>
-              <div className="empresa-nombre">{empresa}</div>
-              <div className="empresa-valor">{datos.actual.toFixed(2)} €</div>
-              <div
-                className={`empresa-diferencia ${
-                  igual ? "neutral" : sube ? "positivo" : "negativo"
-                }`}
-              >
-                {igual ? (
-                  <span>= 0.00 €</span>
-                ) : (
-                  <>
-                    <i className={`fas fa-arrow-${sube ? "up" : "down"}`}></i>
-                    {Math.abs(diferencia).toFixed(2)} €
-                  </>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <div className={`resumen-ingresos ${!mostrar ? "oculto" : ""}`}>
+        <div className="resumen-contenido">
+          <h2><i className="fas fa-chart-line"></i> Resumen por empresa (Mes actual)</h2>
+          <table className="tabla-ingresos">
+            <thead>
+              <tr>
+                <th>Empresa</th>
+                <th>Ingresos (€)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {EMPRESAS.map((empresa) => (
+                <tr key={empresa}>
+                  <td>{empresa}</td>
+                  <td>{(resumen[empresa] || 0).toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td><strong>Total</strong></td>
+                <td><strong>{total.toFixed(2)} €</strong></td>
+              </tr>
+            </tfoot>
+          </table>
 
-      <div className="total-ingresos">
-        <strong>Total global:</strong> {total.toFixed(2)} €
+          <h3 className="detalle-dia">Detalle por día y empresa</h3>
+          <table className="tabla-detalle">
+            <thead>
+              <tr>
+                <th>Día</th>
+                {EMPRESAS.map((e) => (
+                  <th key={e}>{e}</th>
+                ))}
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {detalleDiario.map((fila) => {
+                const totalFila = EMPRESAS.reduce((acc, e) => acc + (fila[e] || 0), 0);
+                return (
+                  <tr key={fila.dia}>
+                    <td>{fila.dia}</td>
+                    {EMPRESAS.map((e) => (
+                      <td key={e}>{(fila[e] || 0).toFixed(2)}</td>
+                    ))}
+                    <td><strong>{totalFila.toFixed(2)}</strong></td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

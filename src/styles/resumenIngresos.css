@@ -1,76 +1,116 @@
 .resumen-ingresos {
-  background: #faf4e8;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
   padding: 2rem;
-  border-radius: 1.2rem;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
-  margin-top: 2rem;
+  margin-top: 3rem;
   font-family: 'Segoe UI', sans-serif;
-  color: #3c2b1c;
+  overflow-x: auto;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  max-height: 9999px;
+  opacity: 1;
 }
 
-.resumen-ingresos h2 {
+.resumen-ingresos.oculto {
+  max-height: 0;
+  opacity: 0;
+  padding: 0 2rem;
+  overflow: hidden;
+}
+
+.toggle-resumen {
+  background: #007bff;
+  color: white;
+  padding: 0.8rem 1.6rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 600;
+  transition: background 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.toggle-resumen:hover {
+  background: #0056b3;
+}
+
+.resumen-contenido h2 {
+  font-size: 1.5rem;
   margin-bottom: 1.5rem;
-  font-size: 1.6rem;
-  color: #5b3c15;
+  color: #333;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.ingresos-empresas {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.2rem;
+.tabla-ingresos,
+.tabla-detalle {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 1.5rem;
+  background: #fcfcfc;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.empresa-card {
-  background: #fffbe6;
-  border: 2px solid #e0c080;
-  border-radius: 0.8rem;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  transition: transform 0.2s;
+.tabla-ingresos th,
+.tabla-detalle th {
+  background: #eef4fb;
+  color: #333;
+  font-weight: 600;
+  padding: 0.9rem 1rem;
+  text-align: left;
+  border-bottom: 2px solid #d3dfea;
 }
 
-.empresa-card:hover {
-  transform: scale(1.03);
-}
-
-.empresa-nombre {
-  font-weight: bold;
-  font-size: 1.1rem;
-}
-
-.empresa-valor {
-  font-size: 1.3rem;
-  color: #4a340d;
-}
-
-.empresa-diferencia {
+.tabla-ingresos td,
+.tabla-detalle td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid #e5e5e5;
+  text-align: left;
   font-size: 0.95rem;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
 }
 
-.empresa-diferencia.positivo {
-  color: green;
-}
-
-.empresa-diferencia.negativo {
-  color: red;
-}
-
-.empresa-diferencia.neutral {
-  color: #999;
-}
-
-.total-ingresos {
-  margin-top: 2rem;
-  text-align: right;
-  font-size: 1.3rem;
-  color: #2c1b0f;
+.tabla-ingresos tfoot td {
   font-weight: bold;
+  background: #e9f3ff;
+  font-size: 1rem;
+}
+
+.tabla-detalle tr:nth-child(even),
+.tabla-ingresos tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+.detalle-dia {
+  margin-top: 2.5rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #444;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .tabla-ingresos,
+  .tabla-detalle {
+    font-size: 0.85rem;
+  }
+
+  .toggle-resumen {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .tabla-ingresos th,
+  .tabla-ingresos td,
+  .tabla-detalle th,
+  .tabla-detalle td {
+    padding: 0.6rem;
+  }
 }
