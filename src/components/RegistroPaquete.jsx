@@ -10,7 +10,9 @@ const COMPANIAS = [
 
 export default function RegistroPaquete({ paquetes, actualizarPaquetes }) {
   const [cliente, setCliente] = useState("");
-  const [compania, setCompania] = useState(COMPANIAS[0]);
+  const [compania, setCompania] = useState(() => {
+    return localStorage.getItem("ultimaCompania") || COMPANIAS[0];
+  });
   const [baldaSugerida, setBaldaSugerida] = useState("");
   const [baldaSeleccionada, setBaldaSeleccionada] = useState("");
   const [loading, setLoading] = useState(false);
@@ -57,15 +59,20 @@ export default function RegistroPaquete({ paquetes, actualizarPaquetes }) {
         compartimento: baldaSeleccionada,
       });
       setCliente("");
-      setCompania(COMPANIAS[0]);
       setExito(true);
-      actualizarPaquetes(); // sin await
+      actualizarPaquetes();
       setTimeout(() => setExito(false), 3000);
     } catch (err) {
       alert("Error: " + err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleChangeCompania = (e) => {
+    const nueva = e.target.value;
+    setCompania(nueva);
+    localStorage.setItem("ultimaCompania", nueva);
   };
 
   return (
@@ -79,7 +86,7 @@ export default function RegistroPaquete({ paquetes, actualizarPaquetes }) {
           value={cliente}
           onChange={(e) => setCliente(e.target.value)}
         />
-        <select value={compania} onChange={(e) => setCompania(e.target.value)}>
+        <select value={compania} onChange={handleChangeCompania}>
           {COMPANIAS.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
