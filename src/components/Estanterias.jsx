@@ -5,6 +5,7 @@ const BALDAS = Array.from({ length: 25 }, (_, i) => `B${i + 1}`);
 
 export default function Estanterias({ paquetes }) {
   const conteo = paquetes.reduce((acc, p) => {
+    if (p.estado === "entregado") return acc; // Excluir paquetes entregados
     acc[p.compartimento] = (acc[p.compartimento] || 0) + 1;
     return acc;
   }, {});
