@@ -225,24 +225,30 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
         </div>
       )}
 
-      {paqueteAEliminar && (
-        <div className="modal-confirmacion">
-          <div className="modal-contenido">
-            <h3>¿Estás seguro?</h3>
-            <p>
-              El paquete de <strong>{paqueteAEliminar.cliente}</strong> será eliminado.
-            </p>
-            <div className="acciones">
-              <button className="btn cancelar" onClick={cancelarEliminar}>
-                Cancelar
-              </button>
-              <button className="btn confirmar" onClick={confirmarEliminar}>
-                Confirmar
-              </button>
-            </div>
-          </div>
+{paqueteAEliminar && (
+  <div className="modal-confirmacion">
+    <div className="modal-overlay" onClick={cancelarEliminar}></div>
+    <div className="modal-contenido elegante">
+      <div className="modal-icono">
+        <i className="fas fa-exclamation-triangle"></i>
+      </div>
+      <div className="texto-confirmacion">
+        <h3>¿Eliminar paquete?</h3>
+        <p>
+          Esta acción eliminará el paquete de <strong>{paqueteAEliminar.cliente}</strong>.
+        </p>
+        <div className="acciones">
+          <button className="btn cancelar" onClick={cancelarEliminar}>
+            Cancelar
+          </button>
+          <button className="btn confirmar" onClick={confirmarEliminar}>
+            Sí, eliminar
+          </button>
         </div>
-      )}
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

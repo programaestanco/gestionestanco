@@ -1,26 +1,19 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import LoginPage from "./pages/LoginPage";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { UserProvider } from "./context/UserContext";
+import DashboardLayout from "./components/DashboardLayout";
+import LoginPage from "./pages/LoginPage";
 
 export default function App() {
   return (
-    <UserProvider>
-      <Router>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </Router>
-    </UserProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/*" element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        } />
+      </Routes>
+    </BrowserRouter>
   );
 }

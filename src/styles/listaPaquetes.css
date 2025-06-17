@@ -1,4 +1,5 @@
 .lista-paquetes {
+  margin-top: -5.5rem;
   padding: 2rem;
   font-family: "Segoe UI", sans-serif;
 }
@@ -167,53 +168,95 @@
 }
 .modal-confirmacion {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(3px);
+  background-color: rgba(0, 0, 0, 0.35);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 2000;
-}
-
-.modal-confirmacion .modal-contenido {
-  background: #fffdf7;
-  color: #3c2f1d;
-  border-radius: 10px;
-  padding: 2rem 2.5rem;
-  text-align: center;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-  max-width: 400px;
-  animation: aparecerToast 0.3s ease;
-}
-
-.modal-confirmacion h3 {
-  margin-bottom: 0.5rem;
-  font-size: 1.6rem;
-}
-
-.modal-confirmacion .acciones {
-  margin-top: 1.5rem;
-  display: flex;
   justify-content: center;
-  gap: 1rem;
+  z-index: 1000;
 }
 
-.modal-confirmacion .btn {
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  font-weight: bold;
+.modal-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
   cursor: pointer;
-  border: none;
 }
 
-.modal-confirmacion .btn.cancelar {
-  background: #bbb;
-  color: #222;
+.modal-contenido.elegante {
+  position: relative;
+  background: #fff;
+  padding: 2rem 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  max-width: 500px;
+  min-width: 340px;
+  animation: fadeInScale 0.3s ease;
+  text-align: left;
 }
 
-.modal-confirmacion .btn.confirmar {
+.modal-contenido.elegante .modal-icono {
+  font-size: 2.5rem;
+  color: #2e7d32;
+  flex-shrink: 0;
+}
+
+.modal-contenido.elegante .texto-confirmacion {
+  flex: 1;
+}
+
+.modal-contenido.elegante .texto-confirmacion h3 {
+  font-size: 1.3rem;
+  color: #2e3a59;
+  margin-bottom: 0.3rem;
+}
+
+.modal-contenido.elegante .texto-confirmacion p {
+  color: #444;
+  font-size: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.acciones .btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.acciones .btn.cancelar {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.acciones .btn.cancelar:hover {
+  background: #ccc;
+}
+
+.acciones .btn.confirmar {
   background: #e53935;
   color: white;
+}
+
+.acciones .btn.confirmar:hover {
+  background: #c62828;
 }
 
 /* Responsive: Vista móvil mejorada */
