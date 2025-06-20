@@ -366,6 +366,80 @@
   cursor: default;
   transition: background-color 0.2s ease;
 }
+.modal-confirmacion .modal-contenido.elegante {
+  max-width: 400px;
+  background: #fdfaf6;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.modal-confirmacion label {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-confirmacion input,
+.modal-confirmacion select {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  font-family: inherit;
+  background-color: #fff;
+  transition: border-color 0.2s ease;
+}
+
+.modal-confirmacion input:focus,
+.modal-confirmacion select:focus {
+  border-color: #7e57c2;
+  outline: none;
+}
+
+.modal-confirmacion .acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.modal-confirmacion .btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.modal-confirmacion .btn.cancelar {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.modal-confirmacion .btn.cancelar:hover {
+  background-color: #ccc;
+}
+
+.modal-confirmacion .btn.confirmar {
+  background-color: #7e57c2;
+  color: #fff;
+}
+
+.modal-confirmacion .btn.confirmar:hover {
+  background-color: #6a48a8;
+}
+
 @media (max-width: 768px) {
   
   .tabla-paquetes td[data-label="Acciones"] {

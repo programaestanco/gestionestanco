@@ -3,6 +3,7 @@ import {
   eliminarPaquete,
   entregarPaquete,
   marcarComoPendiente,
+  editarPaquete,
 } from "../services/paquetesService";
 import "../styles/listaPaquetes.css";
 
@@ -14,8 +15,14 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
   const [filtroBalda, setFiltroBalda] = useState("");
   const [filtroEstado, setFiltroEstado] = useState("pendiente");
   const [paginaActual, setPaginaActual] = useState(1);
-  const [toastMensaje, setToastMensaje] = useState(""); // nuevo unificado
+  const [toastMensaje, setToastMensaje] = useState("");
   const [paqueteAEliminar, setPaqueteAEliminar] = useState(null);
+  const [paqueteAEditar, setPaqueteAEditar] = useState(null);
+  const [formularioEdicion, setFormularioEdicion] = useState({
+    cliente: "",
+    compania: "",
+    compartimento: "",
+  });
 
   const filtrados = paquetes
     .filter((p) => {
@@ -71,6 +78,22 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
     await marcarComoPendiente(id);
     actualizarPaquetes();
     mostrarToast("¡Estado revertido a pendiente!");
+  };
+
+  const handleEditar = (paquete) => {
+    setPaqueteAEditar(paquete);
+    setFormularioEdicion({
+      cliente: paquete.cliente,
+      compania: paquete.compania,
+      compartimento: paquete.compartimento,
+    });
+  };
+
+  const guardarEdicion = async () => {
+    await editarPaquete(paqueteAEditar.id, formularioEdicion);
+    setPaqueteAEditar(null);
+    actualizarPaquetes();
+    mostrarToast("¡Paquete actualizado!");
   };
 
   return (
@@ -133,12 +156,12 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
           <table className="tabla-paquetes">
             <thead>
               <tr>
-                <th><i className="fas fa-user"></i> Cliente</th>
-                <th><i className="fas fa-truck"></i> Compañía</th>
-                <th><i className="fas fa-layer-group"></i> Balda</th>
-                <th><i className="fas fa-calendar-day"></i> Fecha</th>
-                <th><i className="fas fa-tag"></i> Estado</th>
-                <th><i className="fas fa-cogs"></i></th>
+                <th>Cliente</th>
+                <th>Compañía</th>
+                <th>Balda</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -157,14 +180,7 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
                   <td data-label="Fecha">
                     {new Date(p.fecha_recibido).toLocaleDateString()}
                   </td>
-                  <td
-                    data-label="Estado"
-                    className={
-                      p.estado === "entregado"
-                        ? "estado-entregado"
-                        : "estado-pendiente"
-                    }
-                  >
+                  <td data-label="Estado">
                     {p.estado === "entregado"
                       ? `Entregado (${p.precio} €)`
                       : "Pendiente"}
@@ -185,6 +201,12 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
                         <i className="fas fa-undo-alt"></i>
                       </button>
                     )}
+                    <button
+                      className="btn btn-editar"
+                      onClick={() => handleEditar(p)}
+                    >
+                      <i className="fas fa-pen"></i>
+                    </button>
                     <button
                       className="btn btn-eliminar"
                       onClick={() => handleEliminar(p)}
@@ -225,30 +247,103 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
         </div>
       )}
 
-{paqueteAEliminar && (
-  <div className="modal-confirmacion">
-    <div className="modal-overlay" onClick={cancelarEliminar}></div>
-    <div className="modal-contenido elegante">
-      <div className="modal-icono">
-        <i className="fas fa-exclamation-triangle"></i>
-      </div>
-      <div className="texto-confirmacion">
-        <h3>¿Eliminar paquete?</h3>
-        <p>
-          Esta acción eliminará el paquete de <strong>{paqueteAEliminar.cliente}</strong>.
-        </p>
-        <div className="acciones">
-          <button className="btn cancelar" onClick={cancelarEliminar}>
-            Cancelar
-          </button>
-          <button className="btn confirmar" onClick={confirmarEliminar}>
-            Sí, eliminar
-          </button>
+      {paqueteAEliminar && (
+        <div className="modal-confirmacion">
+          <div className="modal-overlay" onClick={cancelarEliminar}></div>
+          <div className="modal-contenido elegante">
+            <div className="modal-icono">
+              <i className="fas fa-exclamation-triangle"></i>
+            </div>
+            <div className="texto-confirmacion">
+              <h3>¿Eliminar paquete?</h3>
+              <p>
+                Esta acción eliminará el paquete de{" "}
+                <strong>{paqueteAEliminar.cliente}</strong>.
+              </p>
+              <div className="acciones">
+                <button className="btn cancelar" onClick={cancelarEliminar}>
+                  Cancelar
+                </button>
+                <button className="btn confirmar" onClick={confirmarEliminar}>
+                  Sí, eliminar
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-)}
+      )}
+
+      {paqueteAEditar && (
+        <div className="modal-confirmacion">
+          <div
+            className="modal-overlay"
+            onClick={() => setPaqueteAEditar(null)}
+          ></div>
+          <div className="modal-contenido elegante">
+            <div className="texto-confirmacion">
+              <h3>Editar paquete</h3>
+              <label>
+                Cliente:
+                <input
+                  type="text"
+                  value={formularioEdicion.cliente}
+                  onChange={(e) =>
+                    setFormularioEdicion({
+                      ...formularioEdicion,
+                      cliente: e.target.value,
+                    })
+                  }
+                />
+              </label>
+              <label>
+  Compañía:
+  <select
+    value={formularioEdicion.compania}
+    onChange={(e) =>
+      setFormularioEdicion({
+        ...formularioEdicion,
+        compania: e.target.value,
+      })
+    }
+  >
+    {[...new Set(paquetes.map((p) => p.compania))].map((c) => (
+      <option key={c} value={c}>{c}</option>
+    ))}
+  </select>
+</label>
+
+<label>
+  Balda:
+  <select
+    value={formularioEdicion.compartimento}
+    onChange={(e) =>
+      setFormularioEdicion({
+        ...formularioEdicion,
+        compartimento: e.target.value,
+      })
+    }
+  >
+    {[...new Set(paquetes.map((p) => p.compartimento))].map((b) => (
+      <option key={b} value={b}>{b}</option>
+    ))}
+  </select>
+</label>
+
+              <div className="acciones">
+                <button
+                  className="btn cancelar"
+                  onClick={() => setPaqueteAEditar(null)}
+                >
+                  Cancelar
+                </button>
+                <button className="btn confirmar" onClick={guardarEdicion}>
+                  Guardar cambios
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -7,6 +7,7 @@ import ListaPaquetes from "./ListaPaquetes";
 import Estanterias from "./Estanterias";
 import ResumenIngresos from "./ResumenIngresos";
 import DashboardPrincipal from "./DashboardPrincipal";
+import PinModal from "./PinModal";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { useLocation, useNavigate, Routes, Route } from "react-router-dom";
 import {
@@ -17,6 +18,8 @@ import {
 export default function DashboardLayout() {
   const { logout, user } = useUser();
   const [paquetes, setPaquetes] = useState([]);
+  const [mostrarPinModal, setMostrarPinModal] = useState(false);
+  const [intentarIrA, setIntentarIrA] = useState(null);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -34,6 +37,24 @@ export default function DashboardLayout() {
   useEffect(() => {
     actualizarPaquetes();
   }, []);
+
+  const manejarAccesoConPin = (ruta) => {
+    setIntentarIrA(ruta);
+    setMostrarPinModal(true);
+  };
+
+  const handlePinCorrecto = () => {
+    setMostrarPinModal(false);
+    if (intentarIrA) {
+      navigate(intentarIrA);
+      setIntentarIrA(null);
+    }
+  };
+
+  const handleCerrarModal = () => {
+    setMostrarPinModal(false);
+    setIntentarIrA(null);
+  };
 
   return (
     <div className="dashboard-layout">
@@ -53,9 +74,6 @@ export default function DashboardLayout() {
           <button onClick={() => navigate("/estanterias")} className={rutaActual === "/estanterias" ? "activo" : ""}>
             <FaBox /> Estantes
           </button>
-          <button onClick={() => navigate("/ingresos")} className={rutaActual === "/ingresos" ? "activo" : ""}>
-            <FaChartBar /> Ingresos
-          </button>
         </div>
       </aside>
 
@@ -68,6 +86,13 @@ export default function DashboardLayout() {
             >
               <FaTachometerAlt /> Dashboard
             </button>
+
+            <button
+              className={`btn-navbar ${rutaActual === "/ingresos" ? "activo" : ""}`}
+              onClick={() => manejarAccesoConPin("/ingresos")}
+            >
+              <FaChartBar /> Área Personal
+            </button>
           </div>
 
           <div className="usuario-area">
@@ -77,7 +102,14 @@ export default function DashboardLayout() {
           </div>
         </header>
 
-        <main className="dashboard-content">
+        <main className={`dashboard-content ${mostrarPinModal ? "blurred" : ""}`}>
+          {mostrarPinModal && (
+            <PinModal
+              onSuccess={handlePinCorrecto}
+              onClose={handleCerrarModal}
+            />
+          )}
+
           <AnimatePresence mode="wait">
             <Motion.div
               key={location.pathname}

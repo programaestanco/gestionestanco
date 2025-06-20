@@ -53,3 +53,14 @@ export const obtenerIngresos = async () => {
   const data = await res.json();
   return data.total;
 };
+// Editar paquete
+export const editarPaquete = async (id, datos) => {
+  const res = await fetch(`${BASE_URL}/paquetes/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(datos),
+  });
+
+  if (!res.ok) throw new Error("Error al editar paquete");
+  return res.json();
+};

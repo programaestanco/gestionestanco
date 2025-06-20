@@ -34,161 +34,149 @@ export default function DashboardPrincipal({ paquetes, actualizarPaquetes }) {
   };
 
   useEffect(() => {
-  const hoyISO = fechaLocalISO(new Date());
-  const horasEntregas = {};
-  const ingresosPorDia = {};
-  const baldas = {};
-  const recibidosPorDia = {};
-  const entregadosPorDia = {};
+    const hoyISO = fechaLocalISO(new Date());
+    const horasEntregas = {};
+    const ingresosPorDia = {};
+    const baldas = {};
+    const recibidosPorDia = {};
+    const entregadosPorDia = {};
 
-  let ingresoHoy = 0;
-  let ingresoTotal = 0;
-  let recibidosHoy = 0;
-  let entregadosHoy = 0;
-  let almacenActual = 0;
+    let ingresoHoy = 0;
+    let ingresoTotal = 0;
+    let recibidosHoy = 0;
+    let entregadosHoy = 0;
+    let almacenActual = 0;
 
-  paquetes.forEach((p) => {
-    const recibidoISO = fechaLocalISO(p.fecha_recibido);
-    const entregadoISO = p.fecha_entregado ? fechaLocalISO(p.fecha_entregado) : null;
+    paquetes.forEach((p) => {
+      const recibidoISO = fechaLocalISO(p.fecha_recibido);
+      const entregadoISO = p.fecha_entregado ? fechaLocalISO(p.fecha_entregado) : null;
 
-    // Contar recibidos por fecha_recibido
-    recibidosPorDia[recibidoISO] = (recibidosPorDia[recibidoISO] || 0) + 1;
-    if (recibidoISO === hoyISO) {
-      recibidosHoy++;
-    }
+      recibidosPorDia[recibidoISO] = (recibidosPorDia[recibidoISO] || 0) + 1;
+      if (recibidoISO === hoyISO) recibidosHoy++;
 
-    // Entregados e ingresos
-    if (p.estado === "entregado" && entregadoISO) {
-      ingresoTotal += Number(p.precio || 0);
-      ingresosPorDia[entregadoISO] = (ingresosPorDia[entregadoISO] || 0) + Number(p.precio || 0);
-      entregadosPorDia[entregadoISO] = (entregadosPorDia[entregadoISO] || 0) + 1;
+      if (p.estado === "entregado" && entregadoISO) {
+        ingresoTotal += Number(p.precio || 0);
+        ingresosPorDia[entregadoISO] = (ingresosPorDia[entregadoISO] || 0) + Number(p.precio || 0);
+        entregadosPorDia[entregadoISO] = (entregadosPorDia[entregadoISO] || 0) + 1;
 
-      if (entregadoISO === hoyISO) {
-        entregadosHoy++;
-        ingresoHoy += Number(p.precio || 0);
-        const hora = new Date(p.fecha_entregado).getHours();
-        horasEntregas[hora] = (horasEntregas[hora] || 0) + 1;
+        if (entregadoISO === hoyISO) {
+          entregadosHoy++;
+          ingresoHoy += Number(p.precio || 0);
+          const hora = new Date(p.fecha_entregado).getHours();
+          horasEntregas[hora] = (horasEntregas[hora] || 0) + 1;
+        }
       }
-    }
 
-    if (p.estado === "pendiente") almacenActual++;
-    baldas[p.compartimento] = (baldas[p.compartimento] || 0) + 1;
-  });
+      if (p.estado === "pendiente") almacenActual++;
 
-  // Excluir día de importación masiva (2025-06-07)
-  const excluirFecha = "2025-06-07";
+      // SOLO contar baldas con nombre válido
+      if (p.compartimento) {
+        baldas[p.compartimento] = (baldas[p.compartimento] || 0) + 1;
+      }
+    });
 
-  const recordRecibidos = Object.entries(recibidosPorDia)
-    .filter(([fecha]) => fecha !== excluirFecha)
-    .map(([, total]) => total)
-    .reduce((max, n) => Math.max(max, n), 0);
+    const excluirFecha = "2025-06-07";
 
-  const recordEntregados = Object.entries(entregadosPorDia)
-    .filter(([fecha]) => fecha !== excluirFecha)
-    .map(([, total]) => total)
-    .reduce((max, n) => Math.max(max, n), 0);
+    const recordRecibidos = Object.entries(recibidosPorDia)
+      .filter(([fecha]) => fecha !== excluirFecha)
+      .map(([, total]) => total)
+      .reduce((max, n) => Math.max(max, n), 0);
 
-  const recordIngreso = Object.entries(ingresosPorDia)
-    .filter(([fecha]) => fecha !== excluirFecha)
-    .map(([, total]) => total)
-    .reduce((max, n) => Math.max(max, n), 0);
+    const recordEntregados = Object.entries(entregadosPorDia)
+      .filter(([fecha]) => fecha !== excluirFecha)
+      .map(([, total]) => total)
+      .reduce((max, n) => Math.max(max, n), 0);
 
-  // Fusionar para historial
-  const historico = {};
-  Object.keys(recibidosPorDia).forEach((fecha) => {
-    historico[fecha] = historico[fecha] || { recibidos: 0, entregados: 0 };
-    historico[fecha].recibidos = recibidosPorDia[fecha];
-  });
-  Object.keys(entregadosPorDia).forEach((fecha) => {
-    historico[fecha] = historico[fecha] || { recibidos: 0, entregados: 0 };
-    historico[fecha].entregados = entregadosPorDia[fecha];
-  });
+    const recordIngreso = Object.entries(ingresosPorDia)
+      .filter(([fecha]) => fecha !== excluirFecha)
+      .map(([, total]) => total)
+      .reduce((max, n) => Math.max(max, n), 0);
 
-  const historialOrdenado = Object.entries(historico)
-    .map(([fecha, datos]) => ({ fecha, ...datos }))
-    .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    const historico = {};
+    Object.keys(recibidosPorDia).forEach((fecha) => {
+      historico[fecha] = historico[fecha] || { recibidos: 0, entregados: 0 };
+      historico[fecha].recibidos = recibidosPorDia[fecha];
+    });
+    Object.keys(entregadosPorDia).forEach((fecha) => {
+      historico[fecha] = historico[fecha] || { recibidos: 0, entregados: 0 };
+      historico[fecha].entregados = entregadosPorDia[fecha];
+    });
 
-  const mejor = historialOrdenado.reduce(
-    (a, b) => (b.entregados > a.entregados ? b : a),
-    { entregados: 0 }
-  );
+    const historialOrdenado = Object.entries(historico)
+      .map(([fecha, datos]) => ({ fecha, ...datos }))
+      .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
-  // Calcular la hora pico por cada día de entregas
-const horasPorDia = {}; // { "2025-06-13": { 10: 3, 12: 5, ... } }
+    const mejor = historialOrdenado.reduce(
+      (a, b) => (b.entregados > a.entregados ? b : a),
+      { entregados: 0 }
+    );
 
-paquetes.forEach((p) => {
-  if (p.estado === "entregado" && p.fecha_entregado) {
-    const fecha = fechaLocalISO(p.fecha_entregado);
-    const hora = new Date(p.fecha_entregado).getHours();
-    if (!horasPorDia[fecha]) horasPorDia[fecha] = {};
-    horasPorDia[fecha][hora] = (horasPorDia[fecha][hora] || 0) + 1;
-  }
-});
+    const horasPorDia = {};
+    paquetes.forEach((p) => {
+      if (p.estado === "entregado" && p.fecha_entregado) {
+        const fecha = fechaLocalISO(p.fecha_entregado);
+        const hora = new Date(p.fecha_entregado).getHours();
+        if (!horasPorDia[fecha]) horasPorDia[fecha] = {};
+        horasPorDia[fecha][hora] = (horasPorDia[fecha][hora] || 0) + 1;
+      }
+    });
 
-// Obtener la hora pico de cada día
-const picosPorDia = Object.values(horasPorDia).map((horas) => {
-  const [horaPico] = Object.entries(horas).sort((a, b) => b[1] - a[1])[0];
-  return parseInt(horaPico); // ej. 13
-});
+    const picosPorDia = Object.values(horasPorDia).map((horas) => {
+      const [horaPico] = Object.entries(horas).sort((a, b) => b[1] - a[1])[0];
+      return parseInt(horaPico);
+    });
 
-// Calcular la media de esas horas pico
-const mediaHoraPico = picosPorDia.length > 0
-  ? Math.round(picosPorDia.reduce((sum, h) => sum + h, 0) / picosPorDia.length)
-  : null;
+    const mediaHoraPico = picosPorDia.length > 0
+      ? Math.round(picosPorDia.reduce((sum, h) => sum + h, 0) / picosPorDia.length)
+      : null;
 
-const horaPico = mediaHoraPico !== null ? `${mediaHoraPico}:00` : "–";
-// Calcular la hora pico por cada día de recibidos pendientes
-const horasRecibidosPorDia = {}; // { "2025-06-13": { 10: 4, 11: 2 } }
+    const horaPico = mediaHoraPico !== null ? `${mediaHoraPico}:00` : "–";
 
-paquetes.forEach((p) => {
-  if (p.estado === "pendiente" && p.fecha_recibido) {
-    const fecha = fechaLocalISO(p.fecha_recibido);
-    const hora = new Date(p.fecha_recibido).getHours();
-    if (!horasRecibidosPorDia[fecha]) horasRecibidosPorDia[fecha] = {};
-    horasRecibidosPorDia[fecha][hora] = (horasRecibidosPorDia[fecha][hora] || 0) + 1;
-  }
-});
+    const horasRecibidosPorDia = {};
+    paquetes.forEach((p) => {
+      if (p.estado === "pendiente" && p.fecha_recibido) {
+        const fecha = fechaLocalISO(p.fecha_recibido);
+        const hora = new Date(p.fecha_recibido).getHours();
+        if (!horasRecibidosPorDia[fecha]) horasRecibidosPorDia[fecha] = {};
+        horasRecibidosPorDia[fecha][hora] = (horasRecibidosPorDia[fecha][hora] || 0) + 1;
+      }
+    });
 
-// Hora más frecuente por día de recibidos
-const picosRecibidosPorDia = Object.values(horasRecibidosPorDia).map((horas) => {
-  const [horaPico] = Object.entries(horas).sort((a, b) => b[1] - a[1])[0];
-  return parseInt(horaPico);
-});
+    const picosRecibidosPorDia = Object.values(horasRecibidosPorDia).map((horas) => {
+      const [horaPico] = Object.entries(horas).sort((a, b) => b[1] - a[1])[0];
+      return parseInt(horaPico);
+    });
 
-// Calcular la media de horas pico de recibidos
-const mediaHoraRecibido = picosRecibidosPorDia.length > 0
-  ? Math.round(picosRecibidosPorDia.reduce((sum, h) => sum + h, 0) / picosRecibidosPorDia.length)
-  : null;
+    const mediaHoraRecibido = picosRecibidosPorDia.length > 0
+      ? Math.round(picosRecibidosPorDia.reduce((sum, h) => sum + h, 0) / picosRecibidosPorDia.length)
+      : null;
 
-const horaPicoRecibido = mediaHoraRecibido !== null ? `${mediaHoraRecibido}:00` : "–";
+    const horaPicoRecibido = mediaHoraRecibido !== null ? `${mediaHoraRecibido}:00` : "–";
 
-  const estantesLlenos = Object.values(baldas).filter((c) => c > 12).length;
+    const estantesLlenos = Object.values(baldas).filter((cantidad) => cantidad > 12).length;
 
-  const mediaDiaria = historialOrdenado.length > 0
-    ? Math.round(historialOrdenado.reduce((sum, d) => sum + d.recibidos, 0) / historialOrdenado.length)
-    : 0;
+    const mediaDiaria = historialOrdenado.length > 0
+      ? Math.round(historialOrdenado.reduce((sum, d) => sum + d.recibidos, 0) / historialOrdenado.length)
+      : 0;
 
-setResumen({
-  recibidosHoy,
-  entregadosHoy,
-  ingresoHoy,
-  ingresoTotal,
-  almacenActual,
-  horaPico: horaPico !== "–" ? `${horaPico}:00` : "–",
-  horaPicoRecibido,
-  estantesLlenos,
-  mediaDiaria,
-  recordRecibidos,
-  recordEntregados,
-  recordIngreso
-});
+    setResumen({
+      recibidosHoy,
+      entregadosHoy,
+      ingresoHoy,
+      ingresoTotal,
+      almacenActual,
+      horaPico,
+      horaPicoRecibido,
+      estantesLlenos,
+      mediaDiaria,
+      recordRecibidos,
+      recordEntregados,
+      recordIngreso
+    });
 
-  setHistorial(historialOrdenado);
-  setMejorDia(mejor?.fecha || null);
-}, [paquetes]);
-
-
-
+    setHistorial(historialOrdenado);
+    setMejorDia(mejor?.fecha || null);
+  }, [paquetes]);
 
   const datosGrafico = Array.from({ length: 24 }, (_, h) => ({
     hora: `${h}:00`,
@@ -210,6 +198,7 @@ setResumen({
       <button className="btn-rapido" onClick={() => setMostrarModal(true)}>
         <FaPlus /> Añadir paquete rápido
       </button>
+
       <div className="grupo-resumen">
         <div className="card-doble">
           <div className="card-doble-icon"><FaBox /></div>
@@ -217,46 +206,28 @@ setResumen({
             <div className="linea-dato">
               <span>Recibidos hoy</span>
               <strong className="valor azul">{resumen.recibidosHoy}</strong>
-<span className="badge-record">
-  <FaTrophy style={{ marginRight: "6px", color: "#0d6efd" }} />
-  Récord diario: {resumen.recordRecibidos}
-</span>            </div>
+              <span className="badge-record">
+                <FaTrophy style={{ marginRight: "6px", color: "#0d6efd" }} />
+                Récord diario: {resumen.recordRecibidos}
+              </span>
+            </div>
             <div className="linea-dato">
               <span>Entregados hoy</span>
               <strong className={`valor ${resumen.entregadosHoy > resumen.recibidosHoy ? "verde" : "gris"}`}>
                 {resumen.entregadosHoy} {resumen.entregadosHoy > resumen.recibidosHoy && "✅"}
               </strong>
-<span className="badge-record">
-  <FaTrophy style={{ marginRight: "6px", color: "#0d6efd" }} />
-  Récord diario: {resumen.recordEntregados}
-</span>            </div>
-          </div>
-        </div>
-
-        <div className="card-doble">
-          <div className="card-doble-icon"><FaEuroSign /></div>
-          <div className="card-doble-contenido">
-            <div className="linea-dato">
-              <span>Ingresos hoy</span>
-              <strong className="valor verde">{formatoIngresos(resumen.ingresoHoy)}</strong>
-            </div>
-            <div className="linea-dato">
-              <span>Ingreso total</span>
-              <strong className="valor azul">{formatoIngresos(resumen.ingresoTotal)}</strong>
-              <span className="toggle-ojo" onClick={() => setMostrarIngresos(v => !v)}>
-                {mostrarIngresos ? <FaEyeSlash /> : <FaEye />}
-              </span>
               <span className="badge-record">
-  <FaTrophy style={{ marginRight: "6px", color: "#0d6efd" }} />
-  Récord diario: {resumen.recordIngreso.toFixed(2)}€</span>
+                <FaTrophy style={{ marginRight: "6px", color: "#0d6efd" }} />
+                Récord diario: {resumen.recordEntregados}
+              </span>
             </div>
           </div>
         </div>
 
-        <ResumenCard icon={<FaWarehouse />} label="Estantes llenos" valor={`${resumen.estantesLlenos}/25`} />
-        <ResumenCard icon={<FaBox />} label="En almacén" valor={resumen.almacenActual} />
         <ResumenCard icon={<FaClock />} label="Hora pico recibidos" valor={resumen.horaPicoRecibido} />
         <ResumenCard icon={<FaTrophy />} label="Media recibidos" valor={resumen.mediaDiaria} />
+        <ResumenCard icon={<FaWarehouse />} label="Estantes llenos" valor={`${resumen.estantesLlenos}/25`} />
+        <ResumenCard icon={<FaBox />} label="En almacén" valor={resumen.almacenActual} />
       </div>
 
       <div className="grafico-horas">
@@ -277,7 +248,6 @@ setResumen({
       </div>
 
       <div className="historial-logros">
-
         <div className="resumen-dia">
           {historial.map((h) => {
             if (h.fecha !== fechaSeleccionada) return null;
@@ -291,8 +261,6 @@ setResumen({
           })}
         </div>
       </div>
-
-
 
       {mostrarModal && (
         <div className="modal-fondo">

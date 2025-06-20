@@ -7,6 +7,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { FaEuroSign, FaEye, FaEyeSlash, FaTrophy } from "react-icons/fa";
 import "../styles/resumenIngresos.css";
 
 const PRECIO_POR_ENTREGA = 0.25;
@@ -26,6 +27,7 @@ export default function ResumenIngresos({ paquetes }) {
   const [total, setTotal] = useState(0);
   const [ganadora, setGanadora] = useState(null);
   const [paginaActual, setPaginaActual] = useState(1);
+  const [mostrarIngresos, setMostrarIngresos] = useState(false);
   const ITEMS_POR_PAGINA = 10;
 
   useEffect(() => {
@@ -79,6 +81,20 @@ export default function ResumenIngresos({ paquetes }) {
     setGanadora(empresaTop);
   }, [paquetes]);
 
+  const getIngresoHoy = () => {
+    const hoyISO = new Date().toISOString().split("T")[0];
+    return detalleDiario.find(d => d.dia === hoyISO)
+      ? EMPRESAS.reduce((acc, e) => acc + (detalleDiario.find(d => d.dia === hoyISO)[e] || 0), 0)
+      : 0;
+  };
+
+  const getRecordIngreso = () => {
+    return detalleDiario.reduce((max, fila) => {
+      const totalDia = EMPRESAS.reduce((acc, e) => acc + (fila[e] || 0), 0);
+      return Math.max(max, totalDia);
+    }, 0);
+  };
+
   const dataGrafico = EMPRESAS.map((empresa, i) => ({
     name: empresa,
     value: resumen[empresa] || 0,
@@ -93,6 +109,31 @@ export default function ResumenIngresos({ paquetes }) {
     <div className="resumen-ingresos">
       <div className="resumen-contenido">
         <h2><i className="fas fa-chart-line"></i> Ingresos por empresa (mes actual)</h2>
+
+        <div className="card-doble resumen-general-ingresos">
+          <div className="card-doble-icon"><FaEuroSign /></div>
+          <div className="card-doble-contenido">
+            <div className="linea-dato">
+              <span>Ingresos hoy</span>
+              <strong className="valor verde">
+                {mostrarIngresos ? `${getIngresoHoy().toFixed(2)}€` : "****"}
+              </strong>
+            </div>
+            <div className="linea-dato">
+              <span>Ingreso total</span>
+              <strong className="valor azul">
+                {mostrarIngresos ? `${total.toFixed(2)}€` : "****"}
+              </strong>
+              <span className="toggle-ojo" onClick={() => setMostrarIngresos(v => !v)}>
+                {mostrarIngresos ? <FaEyeSlash /> : <FaEye />}
+              </span>
+              <span className="badge-record">
+                <FaTrophy style={{ marginRight: "6px", color: "#0d6efd" }} />
+                Récord diario: {getRecordIngreso().toFixed(2)}€
+              </span>
+            </div>
+          </div>
+        </div>
 
         <div className="grafico-pastel">
           <ResponsiveContainer width="100%" height={300}>
