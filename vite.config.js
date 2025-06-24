@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': 'http://localhost:3001'  // 🔁 redirige API al backend
+      '/api': 'http://localhost:3001, https://gestionestanco.vercel.app'  // 🔁 redirige API al backend
     }
   }
 })
