@@ -112,29 +112,32 @@ export default function ResumenIngresos({ paquetes }) {
         <h2><i className="fas fa-chart-line"></i> Ingresos por empresa (mes actual)</h2>
 
         <div className="card-doble resumen-general-ingresos">
-          <div className="card-doble-icon"><FaEuroSign /></div>
-          <div className="card-doble-contenido">
-            <div className="linea-dato">
-              <span>Ingresos hoy</span>
-              <strong className="valor verde">
-                {mostrarIngresos ? `${getIngresoHoy().toFixed(2)}€` : "****"}
-              </strong>
-            </div>
-            <div className="linea-dato">
-              <span>Ingreso total</span>
-              <strong className="valor azul">
-                {mostrarIngresos ? `${total.toFixed(2)}€` : "****"}
-              </strong>
-              <span className="toggle-ojo" onClick={() => setMostrarIngresos(v => !v)}>
-                {mostrarIngresos ? <FaEyeSlash /> : <FaEye />}
-              </span>
-              <span className="badge-record">
-  <FaTrophy style={{ marginRight: "6px", color: "#0d6efd" }} />
-  Récord diario: {mostrarIngresos ? `${getRecordIngreso().toFixed(2)}€` : "****"}
-</span>
-            </div>
-          </div>
-        </div>
+  <div className="card-doble-icon"><FaEuroSign /></div>
+  <div className="card-doble-contenido centrado">
+    <div className="grupo-ingresos">
+      <div className="linea-dato centrado">
+        <span className="etiqueta">Ingresos hoy</span>
+        <span className="valor verde">
+          {mostrarIngresos ? `${getIngresoHoy().toFixed(2)}€` : "****"}
+        </span>
+      </div>
+      <div className="linea-dato centrado">
+        <span className="etiqueta">Ingreso total</span>
+        <span className="valor azul">
+          {mostrarIngresos ? `${total.toFixed(2)}€` : "****"}
+        </span>
+        <span className="toggle-ojo" onClick={() => setMostrarIngresos(v => !v)}>
+          {mostrarIngresos ? <FaEyeSlash /> : <FaEye />}
+        </span>
+        <span className="badge-record">
+          <FaTrophy style={{ marginRight: "6px", color: "#0d6efd" }} />
+          Récord diario: {mostrarIngresos ? `${getRecordIngreso().toFixed(2)}€` : "****"}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
 
         <div className="grafico-pastel">
           <ResponsiveContainer width="100%" height={300}>

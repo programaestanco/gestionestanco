@@ -35,20 +35,36 @@
 
 .card-doble-contenido {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.grupo-ingresos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .linea-dato {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.6rem;
+  justify-content: center;
+  gap: 0.6rem;
   font-size: 1.1rem;
+  text-align: center;
+}
+
+.etiqueta {
+  font-weight: 500;
+  color: #333;
 }
 
 .valor {
   font-weight: bold;
   font-size: 1.3rem;
-  margin-left: auto;
 }
 
 .valor.verde {
@@ -62,7 +78,6 @@
 .toggle-ojo {
   cursor: pointer;
   font-size: 1.2rem;
-  margin-left: 1rem;
   color: #555;
 }
 
@@ -71,7 +86,6 @@
   color: #0369a1;
   padding: 0.2rem 0.6rem;
   border-radius: 8px;
-  margin-left: 1rem;
   font-size: 0.95rem;
   display: flex;
   align-items: center;
@@ -181,6 +195,7 @@
   .linea-dato {
     flex-direction: column;
     align-items: flex-start;
+    text-align: left;
   }
 
   .valor, .toggle-ojo, .badge-record {
