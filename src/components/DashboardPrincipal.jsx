@@ -165,14 +165,29 @@ export default function DashboardPrincipal({ paquetes, actualizarPaquetes }) {
 
       <VolumenPaquetes />
 
-      {mostrarModal && (
-        <div className="modal-fondo">
-          <div className="modal-contenido">
-            <RegistroPaquete paquetes={paquetes} actualizarPaquetes={actualizarPaquetes} />
-            <button className="cerrar-modal" onClick={() => setMostrarModal(false)}>Cerrar</button>
-          </div>
-        </div>
-      )}
+{mostrarModal && (
+  <div
+    className="modal-fondo"
+    onMouseDown={(e) => {
+      // Solo si el mousedown es en el fondo, marcamos que puede cerrar
+      if (e.target === e.currentTarget) {
+        e.currentTarget.dataset.cerrar = "true";
+      }
+    }}
+    onMouseUp={(e) => {
+      // Si el mouseup también fue en el fondo y se marcó, cerramos
+      if (e.target === e.currentTarget && e.currentTarget.dataset.cerrar === "true") {
+        setMostrarModal(false);
+      }
+    }}
+  >
+    <div className="modal-contenido">
+      <button className="cerrar-modal" onClick={() => setMostrarModal(false)}>✕</button>
+      <RegistroPaquete paquetes={paquetes} actualizarPaquetes={actualizarPaquetes} />
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
