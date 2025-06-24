@@ -8,11 +8,12 @@ import Estanterias from "./Estanterias";
 import ResumenIngresos from "./ResumenIngresos";
 import DashboardPrincipal from "./DashboardPrincipal";
 import PinModal from "./PinModal";
+import Devoluciones from "./Devoluciones";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { useLocation, useNavigate, Routes, Route } from "react-router-dom";
 import {
   FaPlus, FaBox, FaThList, FaChartBar,
-  FaSignOutAlt, FaTachometerAlt
+  FaSignOutAlt, FaTachometerAlt, FaUndoAlt
 } from "react-icons/fa";
 
 export default function DashboardLayout() {
@@ -20,6 +21,9 @@ export default function DashboardLayout() {
   const [paquetes, setPaquetes] = useState([]);
   const [mostrarPinModal, setMostrarPinModal] = useState(false);
   const [intentarIrA, setIntentarIrA] = useState(null);
+  const [cantidadDevoluciones, setCantidadDevoluciones] = useState(0);
+  const [hayDevolucionesNuevas, setHayDevolucionesNuevas] = useState(false);
+  const [toastGlobal, setToastGlobal] = useState("");
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,6 +41,33 @@ export default function DashboardLayout() {
   useEffect(() => {
     actualizarPaquetes();
   }, []);
+
+  // Detectar devoluciones vencidas
+  useEffect(() => {
+    const ahora = new Date();
+    const vencidos = paquetes.filter((p) => {
+      const fecha = new Date(p.fecha_recibido);
+      const dias = (ahora - fecha) / (1000 * 60 * 60 * 24);
+      return p.estado === "pendiente" && dias >= 20;
+    });
+    setCantidadDevoluciones(vencidos.length);
+
+    if (vencidos.length > 0) {
+      if (rutaActual !== "/devoluciones") {
+        setHayDevolucionesNuevas(true);
+        setToastGlobal(`⚠ Hay ${vencidos.length} paquetes con más de 20 días sin recoger.`);
+      } else {
+        setHayDevolucionesNuevas(false); // ya entró
+      }
+    }
+  }, [paquetes, rutaActual]);
+
+  useEffect(() => {
+    if (toastGlobal) {
+      const timeout = setTimeout(() => setToastGlobal(""), 6000);
+      return () => clearTimeout(timeout);
+    }
+  }, [toastGlobal]);
 
   const manejarAccesoConPin = (ruta) => {
     setIntentarIrA(ruta);
@@ -74,6 +105,18 @@ export default function DashboardLayout() {
           <button onClick={() => navigate("/estanterias")} className={rutaActual === "/estanterias" ? "activo" : ""}>
             <FaBox /> Estantes
           </button>
+          <button
+            onClick={() => {
+              navigate("/devoluciones");
+              setHayDevolucionesNuevas(false);
+            }}
+            className={`sidebar-link ${rutaActual === "/devoluciones" ? "activo" : ""} ${hayDevolucionesNuevas ? "parpadeo" : ""}`}
+          >
+            <FaUndoAlt /> Devoluciones
+            {cantidadDevoluciones > 0 && (
+              <span className="badge-alerta-num">{cantidadDevoluciones}</span>
+            )}
+          </button>
         </div>
       </aside>
 
@@ -110,6 +153,15 @@ export default function DashboardLayout() {
             />
           )}
 
+          {toastGlobal && (
+            <div className="toast-global">
+              {toastGlobal}
+              <button onClick={() => navigate("/devoluciones")} className="ir-devoluciones">
+                Ver
+              </button>
+            </div>
+          )}
+
           <AnimatePresence mode="wait">
             <Motion.div
               key={location.pathname}
@@ -133,6 +185,9 @@ export default function DashboardLayout() {
                 } />
                 <Route path="/ingresos" element={
                   <ResumenIngresos paquetes={paquetes} />
+                } />
+                <Route path="/devoluciones" element={
+                  <Devoluciones paquetes={paquetes} actualizarPaquetes={actualizarPaquetes} />
                 } />
                 <Route path="*" element={
                   <DashboardPrincipal paquetes={paquetes} actualizarPaquetes={actualizarPaquetes} nombreUsuario={user?.username || "Usuario"} />

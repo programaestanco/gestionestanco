@@ -78,7 +78,21 @@
 .btn-entregar:hover {
   background-color: #218838;
 }
+.btn-entregar-texto {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
 
+.btn-entregar-texto:hover {
+  background-color: #218838;
+}
 .btn-revertir {
   background-color: #ffc107;
   color: black;
@@ -477,5 +491,52 @@
 
   .btn-eliminar:hover {
     background-color: #d32f2f;
+  }
+}
+/* Tablets en vertical: entre 601px y 900px */
+@media (max-width: 900px) {
+  .lista-paquetes {
+    padding: 1.2rem;
+  }
+
+  .tabla-paquetes td {
+    font-size: 0.95rem;
+    padding: 0.8rem;
+  }
+
+  .btn {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.9rem;
+  }
+}
+
+/* Smartphones pequeños: 600px o menos */
+@media (max-width: 600px) {
+  .tabla-paquetes tr {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  .tabla-paquetes td {
+    font-size: 0.9rem;
+    padding: 0.9rem;
+  }
+
+  .tabla-paquetes td::before {
+    font-size: 0.85rem;
+  }
+
+  .btn {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.7rem;
+    margin: 0.3rem 0;
+  }
+
+  .filtros {
+    gap: 0.8rem;
+  }
+
+  .modal-contenido.elegante {
+    padding: 1.2rem;
   }
 }

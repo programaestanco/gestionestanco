@@ -16,6 +16,8 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
   const [filtroEstado, setFiltroEstado] = useState("pendiente");
   const [paginaActual, setPaginaActual] = useState(1);
   const [toastMensaje, setToastMensaje] = useState("");
+  const [seleccionados, setSeleccionados] = useState([]);
+  const [confirmarEliminarVarios, setConfirmarEliminarVarios] = useState(false);
   const [paqueteAEliminar, setPaqueteAEliminar] = useState(null);
   const [paqueteAEditar, setPaqueteAEditar] = useState(null);
   const [formularioEdicion, setFormularioEdicion] = useState({
@@ -96,6 +98,34 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
     mostrarToast("¡Paquete actualizado!");
   };
 
+  const toggleSeleccionado = (id) => {
+    setSeleccionados((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const seleccionarTodos = () => {
+    const idsPagina = paginados.map((p) => p.id);
+    const todosSeleccionados = idsPagina.every((id) =>
+      seleccionados.includes(id)
+    );
+    setSeleccionados((prev) =>
+      todosSeleccionados
+        ? prev.filter((id) => !idsPagina.includes(id))
+        : [...new Set([...prev, ...idsPagina])]
+    );
+  };
+
+  const eliminarSeleccionados = async () => {
+    for (const id of seleccionados) {
+      await eliminarPaquete(id);
+    }
+    setSeleccionados([]);
+    actualizarPaquetes();
+    setConfirmarEliminarVarios(false);
+    mostrarToast("¡Paquetes eliminados correctamente!");
+  };
+
   return (
     <div className="lista-paquetes">
       <h2>
@@ -156,6 +186,16 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
           <table className="tabla-paquetes">
             <thead>
               <tr>
+                <th>
+                  <input
+                    type="checkbox"
+                    onChange={seleccionarTodos}
+                    checked={
+                      paginados.length > 0 &&
+                      paginados.every((p) => seleccionados.includes(p.id))
+                    }
+                  />
+                </th>
                 <th>Cliente</th>
                 <th>Compañía</th>
                 <th>Balda</th>
@@ -174,6 +214,13 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
                       : "estado-pendiente fila-hover"
                   }
                 >
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={seleccionados.includes(p.id)}
+                      onChange={() => toggleSeleccionado(p.id)}
+                    />
+                  </td>
                   <td data-label="Cliente">{p.cliente}</td>
                   <td data-label="Compañía">{p.compania}</td>
                   <td data-label="Balda">{p.compartimento}</td>
@@ -188,11 +235,11 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
                   <td data-label="Acciones">
                     {p.estado === "pendiente" ? (
                       <button
-                        className="btn btn-entregar"
-                        onClick={() => handleEntregar(p.id)}
-                      >
-                        <i className="fas fa-check"></i>
-                      </button>
+  className="btn btn-entregar-texto"
+  onClick={() => handleEntregar(p.id)}
+>
+  Entregar
+</button>
                     ) : (
                       <button
                         className="btn btn-revertir"
@@ -218,6 +265,17 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
               ))}
             </tbody>
           </table>
+
+          {seleccionados.length > 0 && (
+            <div className="acciones-multiples">
+              <button
+                className="btn btn-eliminar"
+                onClick={() => setConfirmarEliminarVarios(true)}
+              >
+                <i className="fas fa-trash-alt"></i> Eliminar seleccionados ({seleccionados.length})
+              </button>
+            </div>
+          )}
 
           <div className="paginacion">
             <button
@@ -273,12 +331,34 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
         </div>
       )}
 
+      {confirmarEliminarVarios && (
+        <div className="modal-confirmacion">
+          <div className="modal-overlay" onClick={() => setConfirmarEliminarVarios(false)}></div>
+          <div className="modal-contenido elegante">
+            <div className="modal-icono">
+              <i className="fas fa-exclamation-triangle"></i>
+            </div>
+            <div className="texto-confirmacion">
+              <h3>¿Eliminar {seleccionados.length} paquetes?</h3>
+              <p>
+                Esta acción eliminará todos los paquetes seleccionados. ¿Seguro que deseas continuar?
+              </p>
+              <div className="acciones">
+                <button className="btn cancelar" onClick={() => setConfirmarEliminarVarios(false)}>
+                  Cancelar
+                </button>
+                <button className="btn confirmar" onClick={eliminarSeleccionados}>
+                  Sí, eliminar todos
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {paqueteAEditar && (
         <div className="modal-confirmacion">
-          <div
-            className="modal-overlay"
-            onClick={() => setPaqueteAEditar(null)}
-          ></div>
+          <div className="modal-overlay" onClick={() => setPaqueteAEditar(null)}></div>
           <div className="modal-contenido elegante">
             <div className="texto-confirmacion">
               <h3>Editar paquete</h3>
@@ -296,44 +376,43 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
                 />
               </label>
               <label>
-  Compañía:
-  <select
-    value={formularioEdicion.compania}
-    onChange={(e) =>
-      setFormularioEdicion({
-        ...formularioEdicion,
-        compania: e.target.value,
-      })
-    }
-  >
-    {[...new Set(paquetes.map((p) => p.compania))].map((c) => (
-      <option key={c} value={c}>{c}</option>
-    ))}
-  </select>
-</label>
-
-<label>
-  Balda:
-  <select
-    value={formularioEdicion.compartimento}
-    onChange={(e) =>
-      setFormularioEdicion({
-        ...formularioEdicion,
-        compartimento: e.target.value,
-      })
-    }
-  >
-    {[...new Set(paquetes.map((p) => p.compartimento))].map((b) => (
-      <option key={b} value={b}>{b}</option>
-    ))}
-  </select>
-</label>
-
-              <div className="acciones">
-                <button
-                  className="btn cancelar"
-                  onClick={() => setPaqueteAEditar(null)}
+                Compañía:
+                <select
+                  value={formularioEdicion.compania}
+                  onChange={(e) =>
+                    setFormularioEdicion({
+                      ...formularioEdicion,
+                      compania: e.target.value,
+                    })
+                  }
                 >
+                  {[...new Set(paquetes.map((p) => p.compania))].map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Balda:
+                <select
+                  value={formularioEdicion.compartimento}
+                  onChange={(e) =>
+                    setFormularioEdicion({
+                      ...formularioEdicion,
+                      compartimento: e.target.value,
+                    })
+                  }
+                >
+                  {[...new Set(paquetes.map((p) => p.compartimento))].map((b) => (
+                    <option key={b} value={b}>
+                      {b}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="acciones">
+                <button className="btn cancelar" onClick={() => setPaqueteAEditar(null)}>
                   Cancelar
                 </button>
                 <button className="btn confirmar" onClick={guardarEdicion}>

@@ -15,6 +15,7 @@ export default function RegistroPaquete({ paquetes, actualizarPaquetes }) {
     return localStorage.getItem("ultimaCompania") || COMPANIAS[0];
   });
   const [compartimento, setCompartimento] = useState("");
+  const [baldaSugerida, setBaldaSugerida] = useState("");
   const [exito, setExito] = useState(false);
   const [loading, setLoading] = useState(false);
   const [compartimentoAnimado, setCompartimentoAnimado] = useState(false);
@@ -22,27 +23,25 @@ export default function RegistroPaquete({ paquetes, actualizarPaquetes }) {
 
   const calcularBaldaSugerida = useCallback(() => {
     const conteo = paquetes.reduce((acc, p) => {
-      if (p.estado === "entregado") return acc;
-      acc[p.compartimento] = (acc[p.compartimento] || 0) + 1;
+      if (p.estado !== "entregado") {
+        acc[p.compartimento] = (acc[p.compartimento] || 0) + 1;
+      }
       return acc;
     }, {});
 
-    const columnas = Array.from({ length: 5 }, (_, colIdx) =>
-      BALDAS.slice(colIdx * 5, colIdx * 5 + 5)
-    );
+    const todas = BALDAS.map((b) => ({
+      nombre: b,
+      cantidad: conteo[b] || 0
+    }));
 
-    const columnasOrdenadas = columnas
-      .map((col) => {
-        const total = col.reduce((sum, b) => sum + (conteo[b] || 0), 0);
-        return { total, baldas: col };
-      })
-      .sort((a, b) => a.total - b.total);
-
-    const menosLlena = columnasOrdenadas[0].baldas;
-    return menosLlena.sort((a, b) => (conteo[a] || 0) - (conteo[b] || 0))[0];
+    todas.sort((a, b) => a.cantidad - b.cantidad);
+    return todas.length > 0 ? todas[0].nombre : BALDAS[0];
   }, [paquetes]);
 
   useEffect(() => {
+    const sugerida = calcularBaldaSugerida();
+    setBaldaSugerida(sugerida);
+
     if (cliente.trim()) {
       const mismoCliente = paquetes.find(
         (p) =>
@@ -55,8 +54,9 @@ export default function RegistroPaquete({ paquetes, actualizarPaquetes }) {
         return;
       }
     }
+
     setClienteRepetido(false);
-    setCompartimento(calcularBaldaSugerida());
+    setCompartimento(sugerida);
   }, [cliente, paquetes, calcularBaldaSugerida]);
 
   useEffect(() => {
@@ -133,7 +133,7 @@ export default function RegistroPaquete({ paquetes, actualizarPaquetes }) {
           <span>
             <FaLightbulb className="icono-sugerencia" />
             <strong>{clienteRepetido ? "Misma balda que otro paquete de este cliente:" : "Sugerido:"}</strong>{" "}
-            {compartimento}
+            {baldaSugerida}
           </span>
           <span className={`seleccionado-animado ${compartimentoAnimado ? "activo" : ""}`}>
             <FaCheckCircle className="icono-sugerencia" />

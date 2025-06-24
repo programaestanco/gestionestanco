@@ -1,0 +1,85 @@
+.devoluciones {
+  padding: 2rem;
+  font-family: 'Segoe UI', sans-serif;
+  color: #333;
+}
+
+.devoluciones h2 {
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+  color: #d35400;
+}
+
+.toast-aviso {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  color: #856404;
+  padding: 1rem 1.2rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.tabla-devoluciones {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.03);
+}
+
+.tabla-devoluciones th,
+.tabla-devoluciones td {
+  padding: 0.9rem 1.1rem;
+  border: 1px solid #e0e0e0;
+  text-align: left;
+}
+
+.tabla-devoluciones thead {
+  background-color: #fbe9e7;
+  color: #bf360c;
+}
+
+.tabla-devoluciones tbody tr:nth-child(even) {
+  background-color: #fdf7f4;
+}
+
+.tabla-devoluciones tbody tr:hover {
+  background-color: #fce9e1;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.tabla-devoluciones input[type="checkbox"] {
+  transform: scale(1.2);
+  accent-color: #d35400;
+}
+
+.btn.btn-eliminar {
+  background-color: #e74c3c;
+  color: #fff;
+  padding: 0.7rem 1.4rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  box-shadow: 0 3px 6px rgba(231, 76, 60, 0.25);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn.btn-eliminar:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn.btn-eliminar:hover:not(:disabled) {
+  background-color: #c0392b;
+  box-shadow: 0 4px 8px rgba(192, 57, 43, 0.3);
+}
