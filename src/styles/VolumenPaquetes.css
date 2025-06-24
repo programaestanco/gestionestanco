@@ -91,3 +91,83 @@
     flex-wrap: wrap;
   }
 }
+.ingresos-resumen {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: #f5f6f8;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.bloque-icono {
+  font-size: 2.2rem;
+  color: #3b82f6;
+  display: flex;
+  align-items: center;
+}
+
+.euro-icono {
+  font-size: 2.5rem;
+}
+
+.datos-ingresos {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fila-superior {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.titulo-ingresos {
+  font-weight: bold;
+  font-size: 1rem;
+  color: #2d3748;
+}
+
+.boton-ocultar {
+  font-size: 1rem;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s ease;
+}
+
+.boton-ocultar:hover {
+  color: #2b6cb0;
+}
+
+.fila-inferior {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.valor-dia {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: green;
+}
+
+.valor-total {
+  font-size: 1rem;
+  color: #333;
+}
+
+.record-box {
+  background: #e0edff;
+  padding: 0.35rem 0.7rem;
+  border-radius: 8px;
+  color: #2563eb;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}

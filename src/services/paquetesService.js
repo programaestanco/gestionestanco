@@ -76,3 +76,13 @@ export const obtenerVolumenPaquetes = async (periodo, fecha = null) => {
   }
   return res.json();
 };
+// Obtener ingresos por periodo (para gráfico)
+export const obtenerIngresosPorPeriodo = async (periodo, fecha = null) => {
+  const query = `periodo=${periodo}` + (fecha ? `&fecha=${fecha}` : "");
+  const res = await fetch(`${BASE_URL}/stats/ingresos?${query}`);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Error al obtener ingresos: ${res.status} - ${text}`);
+  }
+  return res.json();
+};

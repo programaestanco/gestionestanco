@@ -11,20 +11,22 @@ import {
   Brush,
 } from "recharts";
 import { FaEuroSign } from "react-icons/fa";
-import "../styles/VolumenPaquetes.css"; // Reutilizamos mismo estilo
+import { obtenerIngresosPorPeriodo } from "../services/paquetesService";
+import "../styles/VolumenPaquetes.css";
 
 export default function IngresosMonetarios() {
   const [vista, setVista] = useState("anual");
   const [fecha, setFecha] = useState(new Date().toISOString().split("T")[0]);
   const [datos, setDatos] = useState([]);
+  const [error, setError] = useState(null);
 
-  const debeElegirFecha = vista === "diaria" || vista === "mensual" || vista === "historial";
+  const debeElegirFecha = ["diaria", "mensual", "historial"].includes(vista);
 
   useEffect(() => {
-    const url = `/api/stats/ingresos?periodo=${vista}${debeElegirFecha ? `&fecha=${fecha}` : ""}`;
-    fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
+    const cargarDatos = async () => {
+      try {
+        const data = await obtenerIngresosPorPeriodo(vista, debeElegirFecha ? fecha : null);
+
         const ordenar = (data) => {
           if (vista === "mensual" || vista === "diaria") {
             return data.sort((a, b) => parseInt(a.periodo) - parseInt(b.periodo));
@@ -39,9 +41,17 @@ export default function IngresosMonetarios() {
           }
           return data;
         };
+
         setDatos(ordenar(data));
-      })
-      .catch((err) => console.error("Error al cargar datos:", err));
+        setError(null);
+      } catch (err) {
+        console.error("Error al cargar datos:", err);
+        setError("⚠ Error al cargar los datos: " + err.message);
+        setDatos([]);
+      }
+    };
+
+    cargarDatos();
   }, [vista, fecha]);
 
   const ejesXLabel = {
@@ -60,17 +70,6 @@ export default function IngresosMonetarios() {
     }
     return tick;
   };
-
-  if (!datos || datos.length === 0) {
-    return (
-      <div className="grafico-hubspot">
-        <div className="cabecera-grafico">
-          <h3><FaEuroSign /> Ingresos Monetarios ({vista})</h3>
-        </div>
-        <p style={{ padding: "1rem", color: "#999" }}>Sin datos disponibles aún.</p>
-      </div>
-    );
-  }
 
   return (
     <div className="grafico-hubspot">
@@ -100,20 +99,30 @@ export default function IngresosMonetarios() {
         </div>
       )}
 
-      <ResponsiveContainer width="100%" height={320}>
-        <LineChart data={datos}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="periodo" tickFormatter={formatoEjeX} label={{ value: ejesXLabel[vista], position: "insideBottom", offset: -5 }} />
-          <YAxis
-            allowDecimals={true}
-            label={{ value: "Ingresos (€)", angle: -90, position: "insideLeft" }}
-          />
-          <Tooltip formatter={(value) => [`${value.toFixed(2)} €`, "Ingresos"]} />
-          <Legend formatter={() => "Ingresos (€)"} />
-          <Line type="monotone" dataKey="ingresos" stroke="#f59e0b" dot />
-          {vista === "historial" && <Brush dataKey="periodo" height={30} stroke="#f59e0b" />}
-        </LineChart>
-      </ResponsiveContainer>
+      {error ? (
+        <p style={{ padding: "1rem", color: "red" }}>{error}</p>
+      ) : datos.length === 0 ? (
+        <p style={{ padding: "1rem", color: "#999" }}>Sin datos disponibles aún.</p>
+      ) : (
+        <ResponsiveContainer width="100%" height={320}>
+          <LineChart data={datos}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="periodo"
+              tickFormatter={formatoEjeX}
+              label={{ value: ejesXLabel[vista], position: "insideBottom", offset: -5 }}
+            />
+            <YAxis
+              allowDecimals={true}
+              label={{ value: "Ingresos (€)", angle: -90, position: "insideLeft" }}
+            />
+            <Tooltip formatter={(value) => [`${value.toFixed(2)} €`, "Ingresos"]} />
+            <Legend formatter={() => "Ingresos (€)"} />
+            <Line type="monotone" dataKey="ingresos" stroke="#f59e0b" dot />
+            {vista === "historial" && <Brush dataKey="periodo" height={30} stroke="#f59e0b" />}
+          </LineChart>
+        </ResponsiveContainer>
+      )}
     </div>
   );
 }

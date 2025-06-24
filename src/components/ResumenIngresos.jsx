@@ -129,9 +129,9 @@ export default function ResumenIngresos({ paquetes }) {
                 {mostrarIngresos ? <FaEyeSlash /> : <FaEye />}
               </span>
               <span className="badge-record">
-                <FaTrophy style={{ marginRight: "6px", color: "#0d6efd" }} />
-                Récord diario: {getRecordIngreso().toFixed(2)}€
-              </span>
+  <FaTrophy style={{ marginRight: "6px", color: "#0d6efd" }} />
+  Récord diario: {mostrarIngresos ? `${getRecordIngreso().toFixed(2)}€` : "****"}
+</span>
             </div>
           </div>
         </div>
