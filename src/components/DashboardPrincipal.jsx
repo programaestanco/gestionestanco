@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
 import {
-  FaBox, FaClock, FaPlus, FaEuroSign, FaWarehouse, FaTrophy,
-  FaEye, FaEyeSlash, FaCalendarAlt
+  FaBox,
+  FaClock,
+  FaPlus,
+  FaTrophy,
+  FaWarehouse,
+  FaChartLine,
+  FaInbox,
 } from "react-icons/fa";
 import RegistroPaquete from "./RegistroPaquete";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import VolumenPaquetes from "./VolumenPaquetes";
 import "../styles/dashboardPrincipal.css";
 
 export default function DashboardPrincipal({ paquetes, actualizarPaquetes }) {
   const [mostrarModal, setMostrarModal] = useState(false);
-  const [mostrarIngresos, setMostrarIngresos] = useState(false);
-  const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date().toISOString().split("T")[0]);
+  const [fechaSeleccionada] = useState(new Date().toISOString().split("T")[0]);
   const [resumen, setResumen] = useState({
     recibidosHoy: 0,
     entregadosHoy: 0,
@@ -18,28 +22,27 @@ export default function DashboardPrincipal({ paquetes, actualizarPaquetes }) {
     ingresoTotal: 0,
     almacenActual: 0,
     horaPico: "–",
+    horaPicoRecibido: "–",
     estantesLlenos: 0,
     mediaDiaria: 0,
+    mediaEntregados: 0,
     recordRecibidos: 0,
     recordEntregados: 0,
     recordIngreso: 0
   });
-  const [historial, setHistorial] = useState([]);
-  const [mejorDia, setMejorDia] = useState(null);
-
-  const fechaLocalISO = (fechaString) => {
-    const fecha = new Date(fechaString);
-    const offsetMs = fecha.getTimezoneOffset() * 60000;
-    return new Date(fecha.getTime() - offsetMs).toISOString().split("T")[0];
-  };
 
   useEffect(() => {
+    const fechaLocalISO = (fechaString) => {
+      const fecha = new Date(fechaString);
+      const offsetMs = fecha.getTimezoneOffset() * 60000;
+      return new Date(fecha.getTime() - offsetMs).toISOString().split("T")[0];
+    };
+
     const hoyISO = fechaLocalISO(new Date());
-    const horasEntregas = {};
     const ingresosPorDia = {};
-    const baldas = {};
     const recibidosPorDia = {};
     const entregadosPorDia = {};
+    const baldas = {};
 
     let ingresoHoy = 0;
     let ingresoTotal = 0;
@@ -62,102 +65,54 @@ export default function DashboardPrincipal({ paquetes, actualizarPaquetes }) {
         if (entregadoISO === hoyISO) {
           entregadosHoy++;
           ingresoHoy += Number(p.precio || 0);
-          const hora = new Date(p.fecha_entregado).getHours();
-          horasEntregas[hora] = (horasEntregas[hora] || 0) + 1;
         }
       }
 
-      if (p.estado === "pendiente") almacenActual++;
-
-      // SOLO contar baldas con nombre válido
-      if (p.compartimento) {
-        baldas[p.compartimento] = (baldas[p.compartimento] || 0) + 1;
+      if (p.estado === "pendiente") {
+        almacenActual++;
+        if (p.compartimento) {
+          baldas[p.compartimento] = (baldas[p.compartimento] || 0) + 1;
+        }
       }
     });
 
     const excluirFecha = "2025-06-07";
 
-    const recordRecibidos = Object.entries(recibidosPorDia)
-      .filter(([fecha]) => fecha !== excluirFecha)
-      .map(([, total]) => total)
-      .reduce((max, n) => Math.max(max, n), 0);
+    const recordRecibidos = Math.max(
+      ...Object.entries(recibidosPorDia).filter(([f]) => f !== excluirFecha).map(([, v]) => v), 0
+    );
 
-    const recordEntregados = Object.entries(entregadosPorDia)
-      .filter(([fecha]) => fecha !== excluirFecha)
-      .map(([, total]) => total)
-      .reduce((max, n) => Math.max(max, n), 0);
+    const recordEntregados = Math.max(
+      ...Object.entries(entregadosPorDia).filter(([f]) => f !== excluirFecha).map(([, v]) => v), 0
+    );
 
-    const recordIngreso = Object.entries(ingresosPorDia)
-      .filter(([fecha]) => fecha !== excluirFecha)
-      .map(([, total]) => total)
-      .reduce((max, n) => Math.max(max, n), 0);
+    const recordIngreso = Math.max(
+      ...Object.entries(ingresosPorDia).filter(([f]) => f !== excluirFecha).map(([, v]) => v), 0
+    );
 
-    const historico = {};
-    Object.keys(recibidosPorDia).forEach((fecha) => {
-      historico[fecha] = historico[fecha] || { recibidos: 0, entregados: 0 };
-      historico[fecha].recibidos = recibidosPorDia[fecha];
-    });
-    Object.keys(entregadosPorDia).forEach((fecha) => {
-      historico[fecha] = historico[fecha] || { recibidos: 0, entregados: 0 };
-      historico[fecha].entregados = entregadosPorDia[fecha];
-    });
+    const historial = {};
+    for (const fecha of new Set([...Object.keys(recibidosPorDia), ...Object.keys(entregadosPorDia)])) {
+      historial[fecha] = {
+        recibidos: recibidosPorDia[fecha] || 0,
+        entregados: entregadosPorDia[fecha] || 0
+      };
+    }
 
-    const historialOrdenado = Object.entries(historico)
+    const historialOrdenado = Object.entries(historial)
       .map(([fecha, datos]) => ({ fecha, ...datos }))
       .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
-    const mejor = historialOrdenado.reduce(
-      (a, b) => (b.entregados > a.entregados ? b : a),
-      { entregados: 0 }
-    );
-
-    const horasPorDia = {};
-    paquetes.forEach((p) => {
-      if (p.estado === "entregado" && p.fecha_entregado) {
-        const fecha = fechaLocalISO(p.fecha_entregado);
-        const hora = new Date(p.fecha_entregado).getHours();
-        if (!horasPorDia[fecha]) horasPorDia[fecha] = {};
-        horasPorDia[fecha][hora] = (horasPorDia[fecha][hora] || 0) + 1;
-      }
-    });
-
-    const picosPorDia = Object.values(horasPorDia).map((horas) => {
-      const [horaPico] = Object.entries(horas).sort((a, b) => b[1] - a[1])[0];
-      return parseInt(horaPico);
-    });
-
-    const mediaHoraPico = picosPorDia.length > 0
-      ? Math.round(picosPorDia.reduce((sum, h) => sum + h, 0) / picosPorDia.length)
-      : null;
-
-    const horaPico = mediaHoraPico !== null ? `${mediaHoraPico}:00` : "–";
-
-    const horasRecibidosPorDia = {};
-    paquetes.forEach((p) => {
-      if (p.estado === "pendiente" && p.fecha_recibido) {
-        const fecha = fechaLocalISO(p.fecha_recibido);
-        const hora = new Date(p.fecha_recibido).getHours();
-        if (!horasRecibidosPorDia[fecha]) horasRecibidosPorDia[fecha] = {};
-        horasRecibidosPorDia[fecha][hora] = (horasRecibidosPorDia[fecha][hora] || 0) + 1;
-      }
-    });
-
-    const picosRecibidosPorDia = Object.values(horasRecibidosPorDia).map((horas) => {
-      const [horaPico] = Object.entries(horas).sort((a, b) => b[1] - a[1])[0];
-      return parseInt(horaPico);
-    });
-
-    const mediaHoraRecibido = picosRecibidosPorDia.length > 0
-      ? Math.round(picosRecibidosPorDia.reduce((sum, h) => sum + h, 0) / picosRecibidosPorDia.length)
-      : null;
-
-    const horaPicoRecibido = mediaHoraRecibido !== null ? `${mediaHoraRecibido}:00` : "–";
-
-    const estantesLlenos = Object.values(baldas).filter((cantidad) => cantidad > 12).length;
-
-    const mediaDiaria = historialOrdenado.length > 0
+    const mediaDiaria = historialOrdenado.length
       ? Math.round(historialOrdenado.reduce((sum, d) => sum + d.recibidos, 0) / historialOrdenado.length)
       : 0;
+
+    const mediaEntregados = historialOrdenado.length
+      ? Math.round(historialOrdenado.reduce((sum, d) => sum + d.entregados, 0) / historialOrdenado.length)
+      : 0;
+
+    const horaPico = calcularHoraPico(paquetes, "entregado", "fecha_entregado", fechaLocalISO);
+    const horaPicoRecibido = calcularHoraPico(paquetes, "pendiente", "fecha_recibido", fechaLocalISO);
+    const estantesLlenos = Object.values(baldas).filter((v) => v >= 12).length;
 
     setResumen({
       recibidosHoy,
@@ -169,98 +124,46 @@ export default function DashboardPrincipal({ paquetes, actualizarPaquetes }) {
       horaPicoRecibido,
       estantesLlenos,
       mediaDiaria,
+      mediaEntregados,
       recordRecibidos,
       recordEntregados,
       recordIngreso
     });
-
-    setHistorial(historialOrdenado);
-    setMejorDia(mejor?.fecha || null);
   }, [paquetes]);
 
-  const datosGrafico = Array.from({ length: 24 }, (_, h) => ({
-    hora: `${h}:00`,
-    entregas: paquetes.filter((p) => {
-      if (p.estado !== "entregado" || !p.fecha_entregado) return false;
-      const fecha = new Date(p.fecha_entregado);
-      return (
-        fechaLocalISO(p.fecha_entregado) === fechaSeleccionada &&
-        fecha.getHours() === h
-      );
-    }).length,
-  }));
-
-  const formatoIngresos = (valor) => mostrarIngresos ? `${valor.toFixed(2)}€` : "****";
-
   return (
-    <div className="dashboard-principal">
-      <h2>Hola, Estanco Benidoleig</h2>
-      <button className="btn-rapido" onClick={() => setMostrarModal(true)}>
-        <FaPlus /> Añadir paquete rápido
-      </button>
-
-      <div className="grupo-resumen">
-        <div className="card-doble">
-          <div className="card-doble-icon"><FaBox /></div>
-          <div className="card-doble-contenido">
-            <div className="linea-dato">
-              <span>Recibidos hoy</span>
-              <strong className="valor azul">{resumen.recibidosHoy}</strong>
-              <span className="badge-record">
-                <FaTrophy style={{ marginRight: "6px", color: "#0d6efd" }} />
-                Récord diario: {resumen.recordRecibidos}
-              </span>
-            </div>
-            <div className="linea-dato">
-              <span>Entregados hoy</span>
-              <strong className={`valor ${resumen.entregadosHoy > resumen.recibidosHoy ? "verde" : "gris"}`}>
-                {resumen.entregadosHoy} {resumen.entregadosHoy > resumen.recibidosHoy && "✅"}
-              </strong>
-              <span className="badge-record">
-                <FaTrophy style={{ marginRight: "6px", color: "#0d6efd" }} />
-                Récord diario: {resumen.recordEntregados}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <ResumenCard icon={<FaClock />} label="Hora pico recibidos" valor={resumen.horaPicoRecibido} />
-        <ResumenCard icon={<FaTrophy />} label="Media recibidos" valor={resumen.mediaDiaria} />
-        <ResumenCard icon={<FaWarehouse />} label="Estantes llenos" valor={`${resumen.estantesLlenos}/25`} />
-        <ResumenCard icon={<FaBox />} label="En almacén" valor={resumen.almacenActual} />
+    <div className="dashboard-estadisticas">
+      <div className="cabecera-dashboard">
+        <h2>Panel de Estadísticas</h2>
+        <button className="btn-rapido" onClick={() => setMostrarModal(true)}>
+          <FaPlus /> Añadir paquete rápido
+        </button>
       </div>
 
-      <div className="grafico-horas">
-        <h3><FaCalendarAlt /> Entregas por Hora</h3>
-        <input
-          type="date"
-          className="selector-fecha"
-          value={fechaSeleccionada}
-          onChange={(e) => setFechaSeleccionada(e.target.value)}
-        />
-        <BarChart width={600} height={250} data={datosGrafico}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="hora" />
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey="entregas" fill="#3b82f6" />
-        </BarChart>
+      <div className="bloque-estadisticas">
+        <GrupoEstadisticas titulo="Estado del Día" icono={<FaInbox />}>
+          <TarjetaDato icono={<FaBox />} label="Recibidos hoy" valor={resumen.recibidosHoy} record={resumen.recordRecibidos} />
+          <TarjetaDato icono={<FaBox />} label="Entregados hoy" valor={resumen.entregadosHoy} record={resumen.recordEntregados} />
+          <TarjetaDato icono={<FaWarehouse />} label="En almacén" valor={resumen.almacenActual} />
+        </GrupoEstadisticas>
+
+        <GrupoEstadisticas titulo="Promedios" icono={<FaChartLine />}>
+          <TarjetaDato icono={<FaTrophy />} label="Media recibidos" valor={resumen.mediaDiaria} />
+          <TarjetaDato icono={<FaTrophy />} label="Media entregados" valor={resumen.mediaEntregados} />
+          <TarjetaDato
+            icono={<FaWarehouse />}
+            label={<span className="tooltip" data-tooltip="Se considera lleno un estante con 12 o más paquetes pendientes">Estantes llenos</span>}
+            valor={`${resumen.estantesLlenos}/25`}
+          />
+        </GrupoEstadisticas>
+
+        <GrupoEstadisticas titulo="Horarios pico" icono={<FaClock />}>
+          <TarjetaDato icono={<FaClock />} label="Entregas" valor={resumen.horaPico} />
+          <TarjetaDato icono={<FaClock />} label="Recibidos" valor={resumen.horaPicoRecibido} />
+        </GrupoEstadisticas>
       </div>
 
-      <div className="historial-logros">
-        <div className="resumen-dia">
-          {historial.map((h) => {
-            if (h.fecha !== fechaSeleccionada) return null;
-            return (
-              <div key={h.fecha} className={`dia-card ${mejorDia === h.fecha ? "mejor-dia" : ""}`}>
-                <h4>{new Date(h.fecha).toLocaleDateString()}</h4>
-                <p>Recibidos: {h.recibidos}</p>
-                <p>Entregados: {h.entregados}</p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      <VolumenPaquetes />
 
       {mostrarModal && (
         <div className="modal-fondo">
@@ -274,13 +177,45 @@ export default function DashboardPrincipal({ paquetes, actualizarPaquetes }) {
   );
 }
 
-function ResumenCard({ icon, label, valor }) {
+function calcularHoraPico(paquetes, estado, campo, normalizarFecha) {
+  const horasPorDia = {};
+  paquetes.forEach((p) => {
+    if (p.estado === estado && p[campo]) {
+      const fecha = normalizarFecha(p[campo]);
+      const hora = new Date(p[campo]).getHours();
+      if (!horasPorDia[fecha]) horasPorDia[fecha] = {};
+      horasPorDia[fecha][hora] = (horasPorDia[fecha][hora] || 0) + 1;
+    }
+  });
+  const picos = Object.values(horasPorDia).map((horas) => {
+    const [horaPico] = Object.entries(horas).sort((a, b) => b[1] - a[1])[0];
+    return parseInt(horaPico);
+  });
+  return picos.length > 0 ? `${Math.round(picos.reduce((a, b) => a + b, 0) / picos.length)}:00` : "–";
+}
+
+function GrupoEstadisticas({ titulo, icono, children }) {
   return (
-    <div className="resumen-card">
-      {icon}
-      <div>
+    <section className="grupo-estadisticas">
+      <h3 className="titulo-grupo">{icono} {titulo}</h3>
+      <div className="contenedor-tarjetas">{children}</div>
+    </section>
+  );
+}
+
+function TarjetaDato({ icono, label, valor, record }) {
+  const superaRecord = record !== undefined && valor >= record;
+  return (
+    <div className={`tarjeta-dato ${superaRecord ? "record" : ""}`}>
+      <div className="icono">{icono}</div>
+      <div className="contenido">
         <strong>{valor}</strong>
         <span>{label}</span>
+        {record !== undefined && (
+          <div className="subdato">
+            <FaTrophy className="icono-record" /> Récord: {record}
+          </div>
+        )}
       </div>
     </div>
   );

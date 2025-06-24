@@ -18,6 +18,7 @@ export default function RegistroPaquete({ paquetes, actualizarPaquetes }) {
   const [exito, setExito] = useState(false);
   const [loading, setLoading] = useState(false);
   const [compartimentoAnimado, setCompartimentoAnimado] = useState(false);
+  const [clienteRepetido, setClienteRepetido] = useState(false);
 
   const calcularBaldaSugerida = useCallback(() => {
     const conteo = paquetes.reduce((acc, p) => {
@@ -42,8 +43,21 @@ export default function RegistroPaquete({ paquetes, actualizarPaquetes }) {
   }, [paquetes]);
 
   useEffect(() => {
+    if (cliente.trim()) {
+      const mismoCliente = paquetes.find(
+        (p) =>
+          p.cliente.toLowerCase() === cliente.trim().toLowerCase() &&
+          p.estado !== "entregado"
+      );
+      if (mismoCliente) {
+        setCompartimento(mismoCliente.compartimento);
+        setClienteRepetido(true);
+        return;
+      }
+    }
+    setClienteRepetido(false);
     setCompartimento(calcularBaldaSugerida());
-  }, [paquetes, calcularBaldaSugerida]);
+  }, [cliente, paquetes, calcularBaldaSugerida]);
 
   useEffect(() => {
     setCompartimentoAnimado(true);
@@ -64,7 +78,6 @@ export default function RegistroPaquete({ paquetes, actualizarPaquetes }) {
       setCliente("");
       setExito(true);
       actualizarPaquetes();
-      setCompartimento(calcularBaldaSugerida());
       setTimeout(() => setExito(false), 2500);
     } catch (err) {
       alert("Error: " + err.message);
@@ -119,9 +132,10 @@ export default function RegistroPaquete({ paquetes, actualizarPaquetes }) {
         <div className="info-sugerencias">
           <span>
             <FaLightbulb className="icono-sugerencia" />
-            <strong>Sugerido:</strong> {calcularBaldaSugerida()}
+            <strong>{clienteRepetido ? "Misma balda que otro paquete de este cliente:" : "Sugerido:"}</strong>{" "}
+            {compartimento}
           </span>
-          <span className={`seleccionado-animado ${compartimentoAnimado ? 'activo' : ''}`}>
+          <span className={`seleccionado-animado ${compartimentoAnimado ? "activo" : ""}`}>
             <FaCheckCircle className="icono-sugerencia" />
             <strong>Seleccionado:</strong> {compartimento}
           </span>

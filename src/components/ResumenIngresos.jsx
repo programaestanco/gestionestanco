@@ -9,7 +9,7 @@ import {
 } from "recharts";
 import { FaEuroSign, FaEye, FaEyeSlash, FaTrophy } from "react-icons/fa";
 import "../styles/resumenIngresos.css";
-
+import IngresosMonetarios from "./IngresosMonetarios";
 const PRECIO_POR_ENTREGA = 0.25;
 const EMPRESAS = [
   "Amazon", "Seur", "CorreosExpress", "DHL", "GLS",
@@ -108,6 +108,7 @@ export default function ResumenIngresos({ paquetes }) {
   return (
     <div className="resumen-ingresos">
       <div className="resumen-contenido">
+        <IngresosMonetarios />
         <h2><i className="fas fa-chart-line"></i> Ingresos por empresa (mes actual)</h2>
 
         <div className="card-doble resumen-general-ingresos">
