@@ -11,20 +11,22 @@ import {
   Brush,
 } from "recharts";
 import { FaChartLine } from "react-icons/fa";
+import { obtenerVolumenPaquetes } from "../services/paquetesService";
 import "../styles/VolumenPaquetes.css";
 
 export default function VolumenPaquetes() {
   const [vista, setVista] = useState("anual");
   const [fecha, setFecha] = useState(new Date().toISOString().split("T")[0]);
   const [datos, setDatos] = useState([]);
+  const [error, setError] = useState(null);
 
   const debeElegirFecha = ["diaria", "semanal", "mensual", "historial"].includes(vista);
 
   useEffect(() => {
-    const url = `/api/stats/volumen?periodo=${vista}${debeElegirFecha ? `&fecha=${fecha}` : ""}`;
-    fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
+    const obtenerDatos = async () => {
+      try {
+        const data = await obtenerVolumenPaquetes(vista, debeElegirFecha ? fecha : undefined);
+
         const ordenar = (data) => {
           if (vista === "mensual" || vista === "diaria") {
             return data.sort((a, b) => parseInt(a.periodo) - parseInt(b.periodo));
@@ -39,9 +41,17 @@ export default function VolumenPaquetes() {
           }
           return data;
         };
+
         setDatos(ordenar(data));
-      })
-      .catch((err) => console.error("Error al cargar datos:", err));
+        setError(null);
+      } catch (err) {
+        console.error("Error al cargar datos:", err);
+        setDatos([]);
+        setError(err.message || "Error inesperado");
+      }
+    };
+
+    obtenerDatos();
   }, [vista, fecha]);
 
   const ejesXLabel = {
@@ -94,7 +104,9 @@ export default function VolumenPaquetes() {
         </div>
       )}
 
-      {(!datos || datos.length === 0) ? (
+      {error ? (
+        <p className="error-carga">⚠ Error al cargar los datos: {error}</p>
+      ) : (!datos || datos.length === 0) ? (
         <p style={{ padding: "1rem", color: "#999" }}>Sin datos disponibles aún.</p>
       ) : (
         <ResponsiveContainer width="100%" height={320}>

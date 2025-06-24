@@ -53,6 +53,7 @@ export const obtenerIngresos = async () => {
   const data = await res.json();
   return data.total;
 };
+
 // Editar paquete
 export const editarPaquete = async (id, datos) => {
   const res = await fetch(`${BASE_URL}/paquetes/${id}`, {
@@ -62,5 +63,16 @@ export const editarPaquete = async (id, datos) => {
   });
 
   if (!res.ok) throw new Error("Error al editar paquete");
+  return res.json();
+};
+
+// Obtener datos de volumen para el gráfico
+export const obtenerVolumenPaquetes = async (periodo, fecha = null) => {
+  const query = `periodo=${periodo}` + (fecha ? `&fecha=${fecha}` : "");
+  const res = await fetch(`${BASE_URL}/stats/volumen?${query}`);
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Error al obtener volumen: ${res.status} ${errorText}`);
+  }
   return res.json();
 };
