@@ -393,24 +393,62 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
                   ))}
                 </select>
               </label>
-              <label>
-                Balda:
-                <select
-                  value={formularioEdicion.compartimento}
-                  onChange={(e) =>
-                    setFormularioEdicion({
-                      ...formularioEdicion,
-                      compartimento: e.target.value,
-                    })
-                  }
-                >
-                  {[...new Set(paquetes.map((p) => p.compartimento))].map((b) => (
-                    <option key={b} value={b}>
-                      {b}
-                    </option>
-                  ))}
-                </select>
-              </label>
+<label>
+  Balda:
+  <select
+    value={formularioEdicion.compartimento}
+    onChange={(e) =>
+      setFormularioEdicion({
+        ...formularioEdicion,
+        compartimento: e.target.value,
+      })
+    }
+  >
+    {(() => {
+      const baldas = [...new Set(paquetes.map((p) => p.compartimento))];
+      const pendientesPorBalda = baldas.map((b) => ({
+        nombre: b,
+        cantidad: paquetes.filter(
+          (p) => p.compartimento === b && p.estado === "pendiente"
+        ).length,
+      }));
+
+      const baldaMasVacia = pendientesPorBalda.reduce((min, actual) =>
+        actual.cantidad < min.cantidad ? actual : min
+      );
+
+      return pendientesPorBalda
+        .sort((a, b) => {
+          const numA = parseInt(a.nombre.replace("B", ""));
+          const numB = parseInt(b.nombre.replace("B", ""));
+          return numA - numB;
+        })
+        .map(({ nombre, cantidad }) => {
+          let color = "inherit";
+          if (cantidad < 5) color = "green";
+          else if (cantidad === 7) color = "red";
+          else if (cantidad >= 5) color = "#d4aa00";
+
+          const isMasVacia = nombre === baldaMasVacia.nombre;
+
+          return (
+            <option
+              key={nombre}
+              value={nombre}
+              style={{
+                color,
+                backgroundColor: isMasVacia ? "lightgreen" : "transparent",
+              }}
+            >
+              {`${nombre} (${cantidad} paquete${cantidad !== 1 ? "s" : ""})`}
+            </option>
+          );
+        });
+    })()}
+  </select>
+</label>
+
+
               <div className="acciones">
                 <button className="btn cancelar" onClick={() => setPaqueteAEditar(null)}>
                   Cancelar
