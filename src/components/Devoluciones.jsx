@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+/* import React, { useEffect, useState } from "react";
 import { eliminarPaquete } from "../services/paquetesService";
 import "../styles/devoluciones.css";
 
@@ -91,3 +91,4 @@ export default function Devoluciones({ paquetes, actualizarPaquetes }) {
     </div>
   );
 }
+ */
