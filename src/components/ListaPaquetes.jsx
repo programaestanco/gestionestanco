@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+
+import React, { useState, useMemo, useEffect } from "react";
 import {
   eliminarPaquete,
   entregarPaquete,
   marcarComoPendiente,
   editarPaquete,
+  buscarPaquetesPorCliente,
 } from "../services/paquetesService";
 import "../styles/listaPaquetes.css";
 
@@ -26,22 +28,41 @@ export default function ListaPaquetes({ paquetes, actualizarPaquetes }) {
     compartimento: "",
   });
 
-  const filtrados = paquetes
-    .filter((p) => {
-      const coincideBusqueda =
-        !busqueda || p.cliente.toLowerCase().includes(busqueda.toLowerCase());
-      const coincideCompania =
-        !filtroCompania || p.compania === filtroCompania;
-      const coincideBalda = !filtroBalda || p.compartimento === filtroBalda;
-      const coincideEstado =
-        filtroEstado === "todos" || p.estado === filtroEstado;
-      return coincideBusqueda && coincideCompania && coincideBalda && coincideEstado;
-    })
-    .sort((a, b) => new Date(b.fecha_recibido) - new Date(a.fecha_recibido));
+  const filtrados = useMemo(() => {
+    return paquetes
+      .filter((p) => {
+        const coincideBusqueda = !busqueda || p.cliente.toLowerCase().includes(busqueda.toLowerCase());
+        const coincideCompania = !filtroCompania || p.compania === filtroCompania;
+        const coincideBalda = !filtroBalda || p.compartimento === filtroBalda;
+        const coincideEstado = filtroEstado === "todos" || p.estado === filtroEstado;
+        return coincideBusqueda && coincideCompania && coincideBalda && coincideEstado;
+      })
+      .sort((a, b) => new Date(b.fecha_recibido) - new Date(a.fecha_recibido));
+  }, [paquetes, busqueda, filtroCompania, filtroBalda, filtroEstado]);
 
-  const totalPaginas = Math.ceil(filtrados.length / PAQUETES_POR_PAGINA);
-  const inicio = (paginaActual - 1) * PAQUETES_POR_PAGINA;
-  const paginados = filtrados.slice(inicio, inicio + PAQUETES_POR_PAGINA);
+const paginados = useMemo(() => {
+  return filtrados.slice((paginaActual - 1) * PAQUETES_POR_PAGINA, paginaActual * PAQUETES_POR_PAGINA);
+}, [filtrados, paginaActual]);
+
+const totalPaginas = Math.ceil(filtrados.length / PAQUETES_POR_PAGINA);
+
+useEffect(() => {
+  const delayDebounce = setTimeout(async () => {
+    if (busqueda.trim()) {
+      try {
+        const resultados = await buscarPaquetesPorCliente(busqueda.trim());
+        setPaginaActual(1);
+        actualizarPaquetes(resultados); // ⚠️ asegúrate de que acepta resultados directos
+      } catch (err) {
+        console.error("Error al buscar:", err);
+      }
+    } else {
+      actualizarPaquetes(); // vuelve a cargar todos si no hay búsqueda
+    }
+  }, 400); // debounce para evitar peticiones en cada tecla
+
+  return () => clearTimeout(delayDebounce);
+}, [busqueda]);
 
   const cambiarPagina = (nuevaPagina) => {
     if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {

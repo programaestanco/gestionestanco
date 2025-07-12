@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import "../styles/dashboardLayout.css";
 import { useUser } from "../context/useUser";
-import { obtenerPaquetes } from "../services/paquetesService";
+import { obtenerPaquetes, buscarPaquetesPorCliente } from "../services/paquetesService";
 import RegistroPaquete from "./RegistroPaquete";
 import ListaPaquetes from "./ListaPaquetes";
 import Estanterias from "./Estanterias";
 import ResumenIngresos from "./ResumenIngresos";
 import DashboardPrincipal from "./DashboardPrincipal";
 import PinModal from "./PinModal";
-// import Devoluciones from "./Devoluciones";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { useLocation, useNavigate, Routes, Route } from "react-router-dom";
 import {
@@ -25,20 +24,23 @@ export default function DashboardLayout() {
 
   const [mostrarPinModal, setMostrarPinModal] = useState(false);
   const [intentarIrA, setIntentarIrA] = useState(null);
-
-  // const [cantidadDevoluciones, setCantidadDevoluciones] = useState(0);
-  // const [hayDevolucionesNuevas, setHayDevolucionesNuevas] = useState(false);
-  // const [toastGlobal, setToastGlobal] = useState("");
+  const [modoBusqueda, setModoBusqueda] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
   const rutaActual = location.pathname;
 
-  const actualizarPaquetes = async (pagina = 0, resetear = false) => {
+  const actualizarPaquetes = async (pagina = 0, resetear = false, nuevosDatos = null) => {
     try {
-      const { data, total } = await obtenerPaquetes(pagina * 500);
-      setPaquetes(prev => resetear ? data : [...prev, ...data]);
-      setTotal(total);
+      if (nuevosDatos) {
+        setPaquetes(nuevosDatos);
+        setModoBusqueda(true);
+      } else {
+        const { data, total } = await obtenerPaquetes(pagina * 500);
+        setPaquetes(prev => resetear ? data : [...prev, ...data]);
+        setTotal(total);
+        setModoBusqueda(false);
+      }
     } catch (error) {
       console.error("Error al obtener paquetes:", error);
     }
@@ -57,35 +59,6 @@ export default function DashboardLayout() {
       setCargandoMas(false);
     }
   };
-
-  // ==== DETECCIÓN DE DEVOLUCIONES VENCIDAS (DESACTIVADA) ====
-  /*
-  useEffect(() => {
-    const ahora = new Date();
-    const vencidos = paquetes.filter((p) => {
-      const fecha = new Date(p.fecha_recibido);
-      const dias = (ahora - fecha) / (1000 * 60 * 60 * 24);
-      return p.estado === "pendiente" && dias >= 20;
-    });
-    setCantidadDevoluciones(vencidos.length);
-
-    if (vencidos.length > 0) {
-      if (rutaActual !== "/devoluciones") {
-        setHayDevolucionesNuevas(true);
-        setToastGlobal(`⚠ Hay ${vencidos.length} paquetes con más de 20 días sin recoger.`);
-      } else {
-        setHayDevolucionesNuevas(false);
-      }
-    }
-  }, [paquetes, rutaActual]);
-
-  useEffect(() => {
-    if (toastGlobal) {
-      const timeout = setTimeout(() => setToastGlobal(""), 6000);
-      return () => clearTimeout(timeout);
-    }
-  }, [toastGlobal]);
-  */
 
   const manejarAccesoConPin = (ruta) => {
     setIntentarIrA(ruta);
@@ -123,20 +96,6 @@ export default function DashboardLayout() {
           <button onClick={() => navigate("/estanterias")} className={rutaActual === "/estanterias" ? "activo" : ""}>
             <FaBox /> Estantes
           </button>
-          {/*
-          <button
-            onClick={() => {
-              navigate("/devoluciones");
-              setHayDevolucionesNuevas(false);
-            }}
-            className={`sidebar-link ${rutaActual === "/devoluciones" ? "activo" : ""} ${hayDevolucionesNuevas ? "parpadeo" : ""}`}
-          >
-            <FaUndoAlt /> Devoluciones
-            {cantidadDevoluciones > 0 && (
-              <span className="badge-alerta-num">{cantidadDevoluciones}</span>
-            )}
-          </button>
-          */}
         </div>
       </aside>
 
@@ -168,17 +127,6 @@ export default function DashboardLayout() {
             <PinModal onSuccess={handlePinCorrecto} onClose={handleCerrarModal} />
           )}
 
-          {/*
-          {toastGlobal && (
-            <div className="toast-global">
-              {toastGlobal}
-              <button onClick={() => navigate("/devoluciones")} className="ir-devoluciones">
-                Ver
-              </button>
-            </div>
-          )}
-          */}
-
           <AnimatePresence mode="wait">
             <Motion.div
               key={location.pathname}
@@ -189,15 +137,25 @@ export default function DashboardLayout() {
             >
               <Routes location={location} key={location.pathname}>
                 <Route path="/" element={
-                  <DashboardPrincipal paquetes={paquetes} actualizarPaquetes={() => actualizarPaquetes(0, true)} nombreUsuario={user?.username || "Usuario"} />
+                  <DashboardPrincipal
+                    paquetes={paquetes}
+                    actualizarPaquetes={() => actualizarPaquetes(0, true)}
+                    nombreUsuario={user?.username || "Usuario"}
+                  />
                 } />
                 <Route path="/añadir" element={
-                  <RegistroPaquete paquetes={paquetes} actualizarPaquetes={() => actualizarPaquetes(0, true)} />
+                  <RegistroPaquete
+                    paquetes={paquetes}
+                    actualizarPaquetes={() => actualizarPaquetes(0, true)}
+                  />
                 } />
                 <Route path="/buscar" element={
                   <>
-                    <ListaPaquetes paquetes={paquetes} actualizarPaquetes={() => actualizarPaquetes(0, true)} />
-                    {(paquetes.length < total) && (
+                    <ListaPaquetes
+                      paquetes={paquetes}
+                      actualizarPaquetes={(datos) => actualizarPaquetes(0, true, datos)}
+                    />
+                    {!modoBusqueda && paquetes.length < total && (
                       <div style={{ textAlign: "center", marginTop: "1rem" }}>
                         <button onClick={cargarSiguientePagina} disabled={cargandoMas}>
                           {cargandoMas ? "Cargando más..." : "Cargar más resultados"}
@@ -208,13 +166,12 @@ export default function DashboardLayout() {
                 } />
                 <Route path="/estanterias" element={<Estanterias paquetes={paquetes} />} />
                 <Route path="/ingresos" element={<ResumenIngresos paquetes={paquetes} />} />
-                {/*
-                <Route path="/devoluciones" element={
-                  <Devoluciones paquetes={paquetes} actualizarPaquetes={() => actualizarPaquetes(0, true)} />
-                } />
-                */}
                 <Route path="*" element={
-                  <DashboardPrincipal paquetes={paquetes} actualizarPaquetes={() => actualizarPaquetes(0, true)} nombreUsuario={user?.username || "Usuario"} />
+                  <DashboardPrincipal
+                    paquetes={paquetes}
+                    actualizarPaquetes={() => actualizarPaquetes(0, true)}
+                    nombreUsuario={user?.username || "Usuario"}
+                  />
                 } />
               </Routes>
             </Motion.div>

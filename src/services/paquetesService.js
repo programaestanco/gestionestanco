@@ -1,6 +1,27 @@
 const BASE_URL = "https://gestionestancobackend.onrender.com/api";
 
-// Obtener todos los paquetes
+// 🔹 Obtener paquetes pendientes (sin paginación)
+export const obtenerPendientes = async () => {
+  const res = await fetch(`${BASE_URL}/paquetes/pendientes`);
+  if (!res.ok) throw new Error("Error al obtener paquetes pendientes");
+  return res.json();
+};
+
+// 🔹 Obtener paquetes entregados (paginados)
+export const obtenerEntregados = async (desde = 0) => {
+  const res = await fetch(`${BASE_URL}/paquetes/entregados?desde=${desde}`);
+  if (!res.ok) throw new Error("Error al obtener paquetes entregados");
+  return res.json();
+};
+
+// 🔹 Buscar paquetes por cliente (sin límite)
+export const buscarPaquetesPorCliente = async (cliente) => {
+  const res = await fetch(`${BASE_URL}/paquetes/buscar?cliente=${encodeURIComponent(cliente)}`);
+  if (!res.ok) throw new Error("Error al buscar paquetes");
+  return res.json();
+};
+
+// 🔹 Obtener todos los paquetes (paginados)
 export const obtenerPaquetes = async (desde = 0) => {
   const res = await fetch(`${BASE_URL}/paquetes?desde=${desde}`);
   if (!res.ok) throw new Error("Error al obtener paquetes");
@@ -27,7 +48,7 @@ export const entregarPaquete = async (id) => {
   return res.json();
 };
 
-// Revertir a estado pendiente
+// ⚠️ Marcar como pendiente (si se vuelve a activar la ruta)
 export const marcarComoPendiente = async (id) => {
   const res = await fetch(`${BASE_URL}/paquetes/pendiente/${id}`, {
     method: "PUT",
@@ -46,6 +67,17 @@ export const eliminarPaquete = async (id) => {
   return res.json();
 };
 
+// Editar paquete
+export const editarPaquete = async (id, datos) => {
+  const res = await fetch(`${BASE_URL}/paquetes/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(datos),
+  });
+  if (!res.ok) throw new Error("Error al editar paquete");
+  return res.json();
+};
+
 // Obtener ingresos totales
 export const obtenerIngresos = async () => {
   const res = await fetch(`${BASE_URL}/paquetes/ingresos/total`);
@@ -54,19 +86,7 @@ export const obtenerIngresos = async () => {
   return data.total;
 };
 
-// Editar paquete
-export const editarPaquete = async (id, datos) => {
-  const res = await fetch(`${BASE_URL}/paquetes/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(datos),
-  });
-
-  if (!res.ok) throw new Error("Error al editar paquete");
-  return res.json();
-};
-
-// Obtener datos de volumen para el gráfico
+// 🔹 Gráficos: volumen por periodo
 export const obtenerVolumenPaquetes = async (periodo, fecha = null) => {
   const query = `periodo=${periodo}` + (fecha ? `&fecha=${fecha}` : "");
   const res = await fetch(`${BASE_URL}/stats/volumen?${query}`);
@@ -76,7 +96,8 @@ export const obtenerVolumenPaquetes = async (periodo, fecha = null) => {
   }
   return res.json();
 };
-// Obtener ingresos por periodo (para gráfico)
+
+// 🔹 Gráficos: ingresos por periodo
 export const obtenerIngresosPorPeriodo = async (periodo, fecha = null) => {
   const query = `periodo=${periodo}` + (fecha ? `&fecha=${fecha}` : "");
   const res = await fetch(`${BASE_URL}/stats/ingresos?${query}`);
