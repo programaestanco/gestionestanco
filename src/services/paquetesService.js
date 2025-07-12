@@ -1,8 +1,8 @@
 const BASE_URL = "https://gestionestancobackend.onrender.com/api";
 
 // Obtener todos los paquetes
-export const obtenerPaquetes = async () => {
-  const res = await fetch(`${BASE_URL}/paquetes`);
+export const obtenerPaquetes = async (desde = 0) => {
+  const res = await fetch(`${BASE_URL}/paquetes?desde=${desde}`);
   if (!res.ok) throw new Error("Error al obtener paquetes");
   return res.json();
 };

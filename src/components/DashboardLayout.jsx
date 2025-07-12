@@ -19,6 +19,10 @@ import {
 export default function DashboardLayout() {
   const { logout, user } = useUser();
   const [paquetes, setPaquetes] = useState([]);
+  const [pagina, setPagina] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [cargandoMas, setCargandoMas] = useState(false);
+
   const [mostrarPinModal, setMostrarPinModal] = useState(false);
   const [intentarIrA, setIntentarIrA] = useState(null);
 
@@ -30,18 +34,29 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
   const rutaActual = location.pathname;
 
-  const actualizarPaquetes = async () => {
+  const actualizarPaquetes = async (pagina = 0, resetear = false) => {
     try {
-      const datos = await obtenerPaquetes();
-      setPaquetes(datos);
+      const { data, total } = await obtenerPaquetes(pagina * 500);
+      setPaquetes(prev => resetear ? data : [...prev, ...data]);
+      setTotal(total);
     } catch (error) {
       console.error("Error al obtener paquetes:", error);
     }
   };
 
   useEffect(() => {
-    actualizarPaquetes();
+    actualizarPaquetes(0, true);
   }, []);
+
+  const cargarSiguientePagina = () => {
+    const siguiente = pagina + 1;
+    if ((siguiente * 500) < total) {
+      setPagina(siguiente);
+      setCargandoMas(true);
+      actualizarPaquetes(siguiente);
+      setCargandoMas(false);
+    }
+  };
 
   // ==== DETECCIÓN DE DEVOLUCIONES VENCIDAS (DESACTIVADA) ====
   /*
@@ -134,7 +149,6 @@ export default function DashboardLayout() {
             >
               <FaTachometerAlt /> Dashboard
             </button>
-
             <button
               className={`btn-navbar ${rutaActual === "/ingresos" ? "activo" : ""}`}
               onClick={() => manejarAccesoConPin("/ingresos")}
@@ -142,7 +156,6 @@ export default function DashboardLayout() {
               <FaChartBar /> Área Personal
             </button>
           </div>
-
           <div className="usuario-area">
             <button className="btn-logout" onClick={logout}>
               <FaSignOutAlt /> Cerrar sesión
@@ -152,13 +165,10 @@ export default function DashboardLayout() {
 
         <main className={`dashboard-content ${mostrarPinModal ? "blurred" : ""}`}>
           {mostrarPinModal && (
-            <PinModal
-              onSuccess={handlePinCorrecto}
-              onClose={handleCerrarModal}
-            />
+            <PinModal onSuccess={handlePinCorrecto} onClose={handleCerrarModal} />
           )}
 
-          {/* 
+          {/*
           {toastGlobal && (
             <div className="toast-global">
               {toastGlobal}
@@ -179,27 +189,32 @@ export default function DashboardLayout() {
             >
               <Routes location={location} key={location.pathname}>
                 <Route path="/" element={
-                  <DashboardPrincipal paquetes={paquetes} actualizarPaquetes={actualizarPaquetes} nombreUsuario={user?.username || "Usuario"} />
+                  <DashboardPrincipal paquetes={paquetes} actualizarPaquetes={() => actualizarPaquetes(0, true)} nombreUsuario={user?.username || "Usuario"} />
                 } />
                 <Route path="/añadir" element={
-                  <RegistroPaquete paquetes={paquetes} actualizarPaquetes={actualizarPaquetes} />
+                  <RegistroPaquete paquetes={paquetes} actualizarPaquetes={() => actualizarPaquetes(0, true)} />
                 } />
                 <Route path="/buscar" element={
-                  <ListaPaquetes paquetes={paquetes} actualizarPaquetes={actualizarPaquetes} />
+                  <>
+                    <ListaPaquetes paquetes={paquetes} actualizarPaquetes={() => actualizarPaquetes(0, true)} />
+                    {(paquetes.length < total) && (
+                      <div style={{ textAlign: "center", marginTop: "1rem" }}>
+                        <button onClick={cargarSiguientePagina} disabled={cargandoMas}>
+                          {cargandoMas ? "Cargando más..." : "Cargar más resultados"}
+                        </button>
+                      </div>
+                    )}
+                  </>
                 } />
-                <Route path="/estanterias" element={
-                  <Estanterias paquetes={paquetes} />
-                } />
-                <Route path="/ingresos" element={
-                  <ResumenIngresos paquetes={paquetes} />
-                } />
+                <Route path="/estanterias" element={<Estanterias paquetes={paquetes} />} />
+                <Route path="/ingresos" element={<ResumenIngresos paquetes={paquetes} />} />
                 {/*
                 <Route path="/devoluciones" element={
-                  <Devoluciones paquetes={paquetes} actualizarPaquetes={actualizarPaquetes} />
+                  <Devoluciones paquetes={paquetes} actualizarPaquetes={() => actualizarPaquetes(0, true)} />
                 } />
                 */}
                 <Route path="*" element={
-                  <DashboardPrincipal paquetes={paquetes} actualizarPaquetes={actualizarPaquetes} nombreUsuario={user?.username || "Usuario"} />
+                  <DashboardPrincipal paquetes={paquetes} actualizarPaquetes={() => actualizarPaquetes(0, true)} nombreUsuario={user?.username || "Usuario"} />
                 } />
               </Routes>
             </Motion.div>
